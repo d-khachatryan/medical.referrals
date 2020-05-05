@@ -1,0 +1,132 @@
+﻿@model Medicalreferrals.Models.Physician
+
+@{
+    Layout = null;
+}
+
+<div class="create-item">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.PhysicianId)
+
+
+    <div class="container">
+        <div class="row">
+                <div class="col-sm-6 col-md-4 col-lg-2 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PhysicianCode, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.PhysicianCode)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.PhysicianCode, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+            <div class="clear"></div>
+                <div class="col-sm-12 col-md-12 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FirstName, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.FirstName)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.LastName, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.LastName)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PatronymicName, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.PatronymicName)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.PatronymicName, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+            <div class="clear"></div>
+                <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrganizationID, new { @class = "control-label" })
+                        @(Html.Kendo().ComboBoxFor(model => model.OrganizationID)
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbOrganizations)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                        <br />
+                        @Html.ValidationMessageFor(model => model.OrganizationID, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+        </div>
+        <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                    <div class="form-group">
+                        <label class="control-label" style="color: transparent;">.</label>
+                        <div class="input-item align-right">
+                            <button id="rtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+                            <button id="rtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $(".k-textbox").addClass("input-item");
+
+        $("#rtCancel")
+            .click(function () {
+                if ($(this).closest(".k-window-content").data("kendoWindow"))
+                    $(this).closest(".k-window-content").data("kendoWindow").close();
+            });
+        $("#rtSave")
+            .click(function (e) {
+                var item = new Object();
+                item.PhysicianId = '@Model.PhysicianId';
+                item.PhysicianCode = $("#PhysicianCode").val();
+                item.OrganizationID = $("#OrganizationID").val();
+                item.FirstName = $("#FirstName").val();
+                item.LastName = $("#LastName").val();
+                item.PatronymicName = $("#PatronymicName").val();
+
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("SavePhysician", "Physician")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ physician: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt != "1") {
+                        alert(JSON.stringify(dt));
+                    }
+                    else {
+                        if ($(this).closest(".k-window-content").data("kendoWindow"))
+                            $(this).closest(".k-window-content").data("kendoWindow").close();
+                    }
+                }
+                else {
+                    alert(dt);
+                    return false;
+                }
+            });
+    });
+</script>

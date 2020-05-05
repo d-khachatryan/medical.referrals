@@ -1,0 +1,121 @@
+﻿@model IEnumerable<Medicalreferrals.Models.ReferralItem>
+
+@{
+    ViewBag.Title = "Հերթագրման պատուհան";
+}
+
+<h4>Ուղեգրի որոնում</h4>
+<p>Համապատասխան ուղեգիրը գտնելու համար անհրաժեշտ է լրացնել կտրոնում ներկայացված համարը և ուղեգրի հաստատման ամսաթիվը:</p>
+<div class="form-group margin-5-0">
+    <input id="prmReferralId" class="input-item k-textbox" placeholder="Ուղեգրի համար" />
+    @(Html.Kendo().DatePicker()
+      .Name("prmConfirmationDate")
+      .HtmlAttributes(new { placeholder = "Ուղեգրման ա/թ" })
+      .Format("yyyy-MM-dd")
+    )
+    <button type="submit" id="rtSearch" class="k-button" onclick="return Search();"><i class="glyphicon glyphicon-search"></i> Որոնել</button>
+    <button type="submit" class="k-button" onclick="return Clear();"><i class="glyphicon glyphicon-minus"></i> Մաքրել</button>
+</div>
+
+<script type="text/javascript">
+    function Search() {
+        $("#Referral").data("kendoGrid").dataSource.read();
+        return false;
+    }
+    function Clear() {
+        $("#prmReferralId").val("");
+        $("#prmConfirmationDate").val("");
+        $("#Referral").data("kendoGrid").dataSource.read();
+        return false;
+    }
+    function getParameter() {
+        return {
+            referralNumber: $("#prmReferralId").val(),
+            confirmationDate: $("#prmConfirmationDate").val(),
+        };
+    }
+</script>
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralItem>()
+      .Name("Referral")
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.ReferralId);
+          columns.Bound(model => model.ReferralNumber);
+          columns.Bound(model => model.ConfirmationDate).Width(115);
+          columns.Bound(model => model.FirstName);
+          columns.Bound(model => model.LastName);
+          columns.Bound(model => model.PatronymicName);
+          columns.Bound(model => model.BirthDate).Width(115);
+          columns.Bound(model => model.ReferralOrganizationName);
+          columns.Command(commands =>
+          {
+              commands.Custom("cmdCreateReferralOrder").Text("Հերթագրել").Click("CreateReferralOrder");
+          }).Title("Հրահանգներ").Width(180);
+      })
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadReferrals", "ReferralOrder").Data("getParameter"))
+          .Model(model =>
+          {
+              model.Id(p => p.ReferralId);
+          }
+          )
+)
+)
+
+@(Html.Kendo().Window().Name("wReferralOrder")
+              .Draggable().Resizable()
+              .Content("").Modal(true).Actions(actions => actions.Pin().Close())
+              .Visible(false).Events(events => events
+              .Close("onCloseReferralOrder")
+              .Open("onOpenReferralOrder")
+              .Refresh("onRefreshReferralOrder"))
+)
+
+
+<script>
+    $("#wReferralOrder").kendoWindow({
+        width: "95%",
+        height: "85%"
+
+    });
+    function CreateReferralOrder(e) {
+
+
+        var row = $(e.target).closest("tr");
+
+        var grid = $("#Referral").data("kendoGrid");
+        //alert("Ուղեգիրը արդեն հերթագրված է:");
+        var dataItem = grid.dataItem(row);
+        
+        //if (dataItem.ReferralOrderId != null) {
+        //    alert("Ուղեգիրը արդեն հերթագրված է:");
+        //    return false;
+        //}
+
+        var window = $("#wReferralOrder").data("kendoWindow");
+        window.content("");
+        window.title("Նոր գրառում");
+        window.refresh({
+            url: "@Url.Action("ReferralOrderTemplate", "ReferralOrder")" + "?Id=" + 0 + "&referralId=" + dataItem.ReferralId
+        });
+        window.center();
+        window.open();
+        return false;
+    }
+
+    function onOpenReferralOrder(e) {
+        kendo.ui.progress(e.sender.element, true);
+    }
+    function onCloseReferralOrder(e) {
+        $("#Referral").data("kendoGrid").dataSource.read();
+        $(".k-overlay").css("display", "none");
+    }
+    function onRefreshReferralOrder(e) {
+        kendo.ui.progress(e.sender.element, false);
+    }
+</script>

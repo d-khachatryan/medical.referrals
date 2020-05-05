@@ -1,0 +1,87 @@
+﻿@model Medicalreferrals.Models.InvocationChart
+
+@{
+    ViewBag.Title = "Գրաֆիկական տեսք";
+}
+
+
+<div class="container" style="min-width:720px;">
+    <label style="font-weight: normal">Ժամանակահատված</label>
+    <div class="form-group">
+        @(Html.Kendo().DatePicker()
+                .Name("prmStartDate")
+                .Value(DateTime.Today.AddDays(-10))
+        )
+        -
+        @(Html.Kendo().DatePicker()
+                .Name("prmFinishDate")
+                .Value(DateTime.Today)
+        )
+        <button type="submit" class="k-button" onclick="return Search();"><i class="glyphicon glyphicon-search"></i> Թարմացնել</button>
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label for="chkRepeat">
+                <input id="chkRepeat" type="checkbox"> Թարմացնել ինքնաշխատ
+            </label>
+        </div>
+    </div>
+
+    <div class="demo-section k-content wide">
+        @(Html.Kendo().Chart<Medicalreferrals.Models.InvocationChart>()
+        .Name("chart")
+        .ChartArea(area => area
+        .Width(1120)
+        .Height(780)
+        )
+        .Title("Դիմումների վերաբերյալ")
+        .Legend(legend => legend
+            .Position(ChartLegendPosition.Top)
+        )
+        .DataSource(ds => ds.Read(read => read.Action("ReadInvocationChart", "Invocation").Data("getParameter")))
+        .Series(series =>
+        {
+            series.Column(model => model.CNT).Name("Կարգավիճակ");
+        })
+        .CategoryAxis(axis => axis
+            .Categories(model => model.InvocationStatusName)
+            .Labels(labels => labels.Rotation(0))
+            .Crosshair(c => c.Visible(true))
+        )
+        .ValueAxis(axis => axis.Numeric()
+            .Labels(labels => labels.Format("{0:N0}"))
+            .MajorUnit(10)
+        )
+        .Tooltip(tooltip => tooltip
+            .Visible(true)
+            .Shared(true)
+            .Format("{0:N0}")
+        )
+        )
+    </div>
+</div>
+
+<script>
+    function getParameter() {
+        return {
+            startDate: $("#prmStartDate").val(),
+            finishDate: $("#prmFinishDate").val(),
+        };
+    }
+
+    function Search() {
+        $("#chart").data("kendoChart").dataSource.read();
+        $("#chart").data("kendoChart").redraw();
+        $("#chart").data("kendoChart").refresh();
+        return false;
+    }
+
+    setInterval(function () {
+        var lfckv = document.getElementById("chkRepeat").checked;
+        if (lfckv) {
+            $("#chart").data("kendoChart").dataSource.read();
+            $("#chart").data("kendoChart").redraw();
+            $("#chart").data("kendoChart").refresh();
+        }
+    }, 5000);
+</script>

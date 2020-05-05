@@ -1,0 +1,231 @@
+﻿@model Medicalreferrals.Models.InvocationTemplate
+
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveInvocation", "Invocation", FormMethod.Post, new { id = "frmInvocation" }))
+{
+
+<div class="create-item">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.InvocationId)
+
+    <div class="container">
+        <div class="row">
+            <fieldset class="create-fieldset">
+                <legend>Քաղաքացի</legend>
+                <div class="col-sm-12 col-md-4 col-lg-2 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FirstName, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.FirstName)
+                        @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-3 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.LastName, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.LastName)
+                        @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-2 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.PatronymicName, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.PatronymicName)
+                        @Html.ValidationMessageFor(model => model.PatronymicName, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-2 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BirthDate, new { @class = "control-label" })
+                        @(Html.Kendo().DatePickerFor(model => model.BirthDate)
+            //.Format("dd/MM/yyyy")
+            .HtmlAttributes(new { @class = "input-item" })
+                        )
+                        <br />
+                        @Html.ValidationMessageFor(model => model.BirthDate, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ResidentMail, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.ResidentMail)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.ResidentMail, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <h3>Բնակության հասցե</h3>
+                <div class="col-sm-12 col-md-6 col-lg-2 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.RegionId, new { @class = "control-label" })
+                        @(Html.Kendo().ComboBoxFor(model => model.RegionId)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .Filter(FilterType.StartsWith)
+    .BindTo(ViewBag.vbRegions)
+    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                        <br />
+                        @Html.ValidationMessageFor(model => model.RegionId, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.CommunityId, new { @class = "control-label" })
+                        @(Html.Kendo().ComboBoxFor(model => model.CommunityId)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .Filter(FilterType.StartsWith)
+    .BindTo(ViewBag.vbCommunities)
+    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                        <br />
+                        @Html.ValidationMessageFor(model => model.CommunityId, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Street, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Street)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.Street, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-1 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Home, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Home)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.Home, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-4 col-lg-2 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Room, new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Room)
+                        <br />
+                        @Html.ValidationMessageFor(model => model.Room, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="clear"></div>
+
+                <div class="clear"></div>
+            </fieldset>
+        </div>
+        <div class="row">
+            <fieldset class="create-fieldset">
+                <div class="col-sm-12 col-md-6 col-lg-9 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrganizationId, new { @class = "control-label" })
+                        @(Html.Kendo().ComboBoxFor(model => model.OrganizationId)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .Filter(FilterType.StartsWith)
+    .BindTo(ViewBag.vbOrganizations)
+    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                        <br />
+                        @Html.ValidationMessageFor(model => model.OrganizationId, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.InvocationPurposeId, new { @class = "control-label" })
+                        @(Html.Kendo().ComboBoxFor(model => model.InvocationPurposeId)
+    .DataTextField("Text")
+    .DataValueField("Value")
+    .Filter(FilterType.StartsWith)
+    .BindTo(ViewBag.vbInvocationPurposes)
+    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                        <br />
+                        @Html.ValidationMessageFor(model => model.InvocationPurposeId, null, new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+            <div class="align-right">
+                <button id="itSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+                <button id="itCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+
+<script>
+    $(document).ready(function () {
+        $(".k-textbox").addClass("input-item");
+
+        $("#itCancel")
+            .click(function () {
+                $(this).closest(".k-window-content").data("kendoWindow").close();
+                return false;
+            });
+        $("#itSave")
+            .click(function (e) {
+                var errTempl = '<div class="k-widget k-tooltip k-tooltip-validation" style="margin:0.5em"><span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div></div>';
+                var validator = $("#frmInvocation").kendoValidator({
+                    errorTemplate: errTempl
+                }).data("kendoValidator");
+                if (!validator.validate()) {
+                    return false;
+                }
+
+                var item = new Object();
+                item.InvocationId = '@Model.InvocationId';
+
+                item.FirstName = $("#FirstName").val();
+                item.LastName = $("#LastName").val();
+                item.PatronymicName = $("#PatronymicName").val();
+                item.BirthDate = $("#BirthDate").val();
+                item.ResidentMail = $("#ResidentMail").val();
+                item.RegionId = $("#RegionId").val();
+                item.CommunityId = $("#CommunityId").val();
+                item.Street = $("#Street").val();
+                item.Home = $("#Home").val();
+                item.Room = $("#Room").val();
+                item.OrganizationId = $("#OrganizationId").val();
+                item.InvocationPurposeId = $("#InvocationPurposeId").val();
+                
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("SaveInvocation", "Invocation")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ invocationTemplate: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt.statuscode == 1) {
+                        $(this).closest(".k-window-content").data("kendoWindow").close();
+                        return false;
+                    }
+                    else {
+                        //$("#errormssg").html(dt.message);
+                        return false;
+                    }
+                }
+                else {
+                    //system error ocured. The popup will be closed. The view will be redirected to error page.
+                    $(this).closest(".k-window-content").data("kendoWindow").close();
+                }
+            });
+    });
+</script>

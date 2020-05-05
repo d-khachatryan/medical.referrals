@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Ուղեգրման նպատակներ";
+}
+@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralPurpose>()
+              .Name("ReferralPurpose")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.ReferralPurposeId).Width(70);
+                  columns.Bound(product => product.ReferralPurposeCode);
+                  columns.Bound(product => product.ReferralPurposeName);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել").HtmlAttributes(new { @class = "Cat_Delete_Icon" });
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+                  toolbar.Save().SaveText("Հիշել").CancelText("Ընդհատել");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.ReferralPurposeId);
+                        model.Field(product => product.ReferralPurposeId).Editable(false);
+                    })
+                    .Create(create => create.Action("ReferralPurposeCreate", "Catalog"))
+                    .Read(read => read.Action("ReferralPurposeRead", "Catalog"))
+                    .Update(update => update.Action("ReferralPurposeUpdate", "Catalog"))
+                    .Destroy(destroy => destroy.Action("ReferralPurposeDestroy", "Catalog"))
+              )
+              .Pageable()
+              .HtmlAttributes(new { @class = "catalog-grid" })
+              .Scrollable()
+)
+

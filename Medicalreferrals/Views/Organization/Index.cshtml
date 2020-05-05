@@ -1,0 +1,246 @@
+﻿@model IEnumerable<Medicalreferrals.Models.OrganizationItem>
+
+@{
+    ViewBag.Title = "Հիմնարկի տվյալներ";
+}
+
+
+<script type="text/javascript">
+    $(document)
+        .ready(function () {
+            currentOrganizationIndex = -1;
+        });
+
+</script>
+
+@(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Նոր Գրառում").Id("btnInsert").Click("CreateOrganization");
+        //items.Add().Type(CommandType.Button).Togglable(false).Text("Դիտել").Id("btnDetail").Click("ShowDetail");
+    })
+)
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.OrganizationItem>()
+      .Name("Organization")
+      .Events(events => events.DataBound("onOrganizationDataBound").DetailExpand("onOrganizationDetailExpand"))
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.OrganizationId).Width(86);
+          columns.Bound(model => model.OrganizationCode).Width(86);
+          columns.Bound(model => model.OrganizationName);
+          columns.Bound(model => model.RegionName).Width(130);
+          columns.Bound(model => model.HeadName).Width(300);
+          columns.Bound(model => model.OrganizationTypeName).Width(300);
+          columns.Command(commands =>
+          {
+              commands.Custom("cmdUpdateOrganization").Text(" ").Click("UpdateOrganization").HtmlAttributes(new { @class = "Update_Icon" });
+              commands.Custom("cmdDeleteOrganization").Text(" ").Click("DeleteOrganization").HtmlAttributes(new { @class = "Delete_Icon" });
+          }).Title("Հրահանգներ").Width(130);
+      })
+
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Filterable()
+      .Scrollable()
+      .Sortable()
+      .HtmlAttributes(new { style = "height:620px;" })
+      .ClientDetailTemplateId("template")
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadOrganizations", "Organization"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("OrganizationId").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.OrganizationId);
+          }
+          )
+)
+)
+
+@(Html.Kendo().Window().Name("wOrganization")
+              //.Width(900)
+              //.Height(450)
+              .Draggable().Resizable()
+              .Content("").Modal(true).Actions(actions => actions.Pin().Close())
+              .Visible(false).Events(events => events
+              .Close("onCloseOrganization")
+              .Open("onOpenOrganization")
+              .Refresh("onRefreshOrganization"))
+)
+
+<script>
+
+    $("#wOrganization").kendoWindow({
+        width: "95%",
+        height: "85%"
+
+    });
+
+    function onOrganizationDataBound(e) {
+        showCommandIcons();
+
+        if (currentOrganizationIndex != -1) {
+            var row = $(this.tbody).find("tr.k-master-row:eq(" + currentOrganizationIndex + ")");
+            this.expandRow(row);
+        }
+    }
+
+    function onOrganizationDetailExpand(e) {
+        currentOrganizationIndex = $(e.masterRow).index(".k-master-row");
+        var selectedItem = this.dataItem(e.masterRow);
+        OID = selectedItem.OrganizationId;
+        //RSID = selectedItem.OrganizationStatusId;
+        this.collapseRow(this.tbody.find(' > tr.k-master-row').not(e.masterRow));
+    }
+
+    function CreateOrganization() {
+        var window = $("#wOrganization").data("kendoWindow");
+        window.content("");
+        window.title("Նոր գրառում");
+        window.refresh({
+            url: "@Url.Action("CreateOrganization", "Organization")"
+        });
+        window.center();
+        window.open();
+        return false;
+    }
+
+    function UpdateOrganization(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#Organization").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var window = $("#wOrganization").data("kendoWindow");
+        window.content("");
+        window.title("Խմբագրում");
+        window.refresh({
+            url: "@Url.Action("UpdateOrganization", "Organization")" + "/" + dataItem.OrganizationId
+        });
+        window.center();
+        window.open();
+        return false;
+    }
+
+    function DeleteOrganization(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#Organization").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var r = confirm("Ցանկանում էք հեռացնել գրառումը՞:");
+        if (r == false) {
+            return false;
+        }
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("DeleteOrganization", "Organization")',
+            dataType: "json",
+            type: "GET",
+            data: {
+                id: dataItem.OrganizationId
+            },
+            async: false,
+            success: function (data) {
+                dt = data;
+                rt = true;
+            },
+            error: function (xhr) {
+                dt = xhr;
+                rt = false;
+            }
+        });
+        if (rt == true) {
+            if (dt.success != true) {
+                alert(JSON.stringify(dt));
+            }
+            else {
+                $("#Organization").data("kendoGrid").dataSource.read();
+            }
+        }
+        else {
+            alert(JSON.stringify("Unknown error occured."));
+            return false;
+        }
+    }
+
+    function onOpenOrganization(e) {
+        kendo.ui.progress(e.sender.element, true);
+    }
+    function onCloseOrganization(e) {
+        $("#Organization").data("kendoGrid").dataSource.read();
+        $(".k-overlay").css("display", "none");
+    }
+    function onRefreshOrganization(e) {
+        kendo.ui.progress(e.sender.element, false);
+    }
+
+</script>
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+          .Name("tabStrip_#=OrganizationId#")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Բյուջեի խմբեր").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.OrganizationBudgetLineItem>()
+              .Name("BudgetLine_#=OrganizationId#")
+              .Events(e => e.DataBound("showCommandIcons"))
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.OrganizationBudgetLineId).Hidden();
+                  columns.Bound(model => model.OrganizationId).Hidden();
+                  columns.Bound(model => model.BudgetLineCode).Width(130);
+                  columns.Bound(model => model.BudgetLineName);
+                  columns.Bound(model => model.IsOrderable).HtmlAttributes(new { style = "text-align: center;" })
+                  .ClientTemplate(
+                                "\\#if(IsOrderable){\\#" +
+                                "<i class=\"fa fa-check-square-o\"></i>" +
+                                "\\#} else {\\#" +
+                                "<i class=\"fa fa-square-o\"></i>" +
+                                "\\# } \\#"
+                            ).Width(130);
+                  columns.Bound(model => model.IsReferrable).HtmlAttributes(new { style = "text-align: center;" })
+                  .ClientTemplate(
+                                "\\#if(IsReferrable){\\#" +
+                                "<i class=\"fa fa-check-square-o\"></i>" +
+                                "\\#} else {\\#" +
+                                "<i class=\"fa fa-square-o\"></i>" +
+                                "\\# } \\#"
+                            ).Width(130);
+                  //columns.Command(commands =>
+                  //{
+                  //    commands.Custom("UpdateGroup_#=OrganizationId#").Text(" ").Click("UpdateOrganizationBudgetLine").HtmlAttributes(new { @class = "Update_Icon" });
+                  //    commands.Custom("DeleteGroup_#=OrganizationId#").Text(" ").Click("DeleteOrganizationBudgetLine").HtmlAttributes(new { @class = "Delete_Icon" });
+                  //}).Title("Հրահանգներ").Width(130).HtmlAttributes(new { style = "text-align: center" });
+              })
+                  //.ToolBar(toolbar =>
+                  //{
+                  //    toolbar.Custom().Name("CreateBudgetLine_#=OrganizationId#").Text("Նոր գրառում").HtmlAttributes(new { onclick = "return CreateOrganizationBudgetLine();" });
+                  //})
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadOrganizationBudgetLineItems", "Organization", new { id = "#=OrganizationId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.OrganizationBudgetLineId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+          })
+            .ToClientTemplate())
+</script>
+

@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=yes">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @*<link rel="stylesheet" href="@Url.Content("~/Content/font-awesome/css/font-awesome.min.css")"/>*@
+    @Styles.Render("~/Content/font-awesome/css/css")
+
+    <!-- IE8 support for HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    @*jQuery v1.12.3*@
+    @Scripts.Render("~/bundles/jquery")
+    @*Modernizr*@
+    @Scripts.Render("~/bundles/modernizr")
+    @*Mmenu jQuery*@
+    @Scripts.Render("~/bundles/mmenu")
+
+    <!--This bundle was moved by the Telerik VS Extensions for compatibility reasons-->
+    @Styles.Render("~/Content/kendo/2016.2.714/kendo")
+    @Scripts.Render("~/bundles/kendo")
+    @RenderSection("Styles", false)
+</head>
+
+<body>
+    <div id="page">
+        <div class="header navbar navbar-fixed-top">
+            <a href="#menu"></a>
+            @ViewBag.Title
+        </div>
+        <div class="content">
+            @RenderBody()
+        </div>
+        <nav id="menu">
+            <ul>
+                @*<li><a href="@Url.Action("Index", "Home")"><i class="fa fa-home"></i> Գլխավոր էջ</a></li>*@
+
+                <li>
+                    <span><i class="fa fa-hospital-o"></i>Ուղեգրումներ</span>
+                    <ul>
+                        <li>
+                            <span>Դիմումների գործընթաց</span>
+                            <ul>
+                                <li><a href="@Url.Action("Index1", "Invocation")">Ներկայացում</a></li>
+                                <li><a href="@Url.Action("Index2", "Invocation")">Համաձայնեցում</a></li>
+                                <li><a href="@Url.Action("Index3", "Invocation")">Բավարարում</a></li>
+                                <li><a href="@Url.Action("InvocationChart", "Invocation")">Գրաֆիկական տեսք</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span>Ուղեգրման գործընթաց</span>
+                            <ul>
+                                <li><a href="@Url.Action("Index1", "Referral")">Նախապատրաստում</a></li>
+                                <li><a href="@Url.Action("Index2", "Referral")">Համաձայնեցում</a></li>
+                                <li><a href="@Url.Action("Index3", "Referral")">Հաստատում</a></li>
+                                <li><a href="@Url.Action("Index4", "Referral")">Իրացում</a></li>
+                                <li><a href="@Url.Action("ReferralChart", "Referral")">Գրաֆիկական տեսք</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <span><i class="fa fa-medkit"></i> Հերթագրում</span>
+                    <ul>
+                        <li><a href="@Url.Action("Index1", "ReferralOrder")">Նախապատրաստում</a></li>
+                        <li><a href="@Url.Action("Index2", "ReferralOrder")">Համաձայնեցում</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <span><i class="fa fa-cogs"></i> Կառավարում</span>
+                    <ul>                        
+                        <li>
+                            <span>Հիմնարկներ</span>
+                            <ul>
+                                <li><a href="@Url.Action("Index", "Organization")">Հիմնարկի տվյալներ</a></li>
+                                <li><a href="@Url.Action("OrganizationType", "Catalog")">Հիմնարկի տեսակներ</a></li>
+                                <li><a href="@Url.Action("Index", "Budget")">Բյուջեներ</a></li>
+                                <li><a href="@Url.Action("Index", "ReferralDistribution")">Ուղեգրման քվոտաներ</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span>Գործողություններ</span>
+                            <ul>
+                                <li>
+                                    <span>Դիմումների գործընթաց</span>
+                                    <ul>
+                                        <li><a href="@Url.Action("Index", "InvocationDocumentLogItem")">Դիմումին կցված փաստաթղթեր</a></li>
+                                        <li><a href="@Url.Action("Index", "InvocationLogItem")">Դիմում</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span>Ուղեգրի իրացում</span>
+                                    <ul>
+                                        <li><a href="@Url.Action("Index", "ReferralConsultationLogItem")">Խորհրդատվություն</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralExaminationLogItem")">Հետազոտություններ</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralProcedureLogItem")">Պրոցեդուրաներ</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralServiceLogItem")">Ծառայություններ</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralSurgeryLogItem")">Միջամտություններ</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <span>Ուղեգրման գործընթաց</span>
+                                    <ul>
+                                        <li><a href="@Url.Action("Index", "ReferralDocumentLogItem")">Ուղեգրին կցվող փաստաթղթեր</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralLogItem")">Ուղեգրում</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralOrderLogItem")">Ուղեգրի կարգավիճակ</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralSocialDiseaseLogItem")">Սոցիալական հիվանդություններ</a></li>
+                                        <li><a href="@Url.Action("Index", "ReferralSocialGroupLogItem")">Սոցկարգավիճակ</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span>Շտեմարաններ</span>
+                            <ul>
+                                <li><a href="@Url.Action("BudgetLine", "Catalog")">Բյուջետային ծրագրեր</a></li>
+                                <li><a href="@Url.Action("ChangeBase", "Catalog")">Բյուջեի փոփոխման հիմքեր</a></li>
+                                <li><a href="@Url.Action("Diagnose", "Catalog")">Հիմնական ախտորոշումներ</a></li>
+                                <li><a href="@Url.Action("DocumentType", "Catalog")">Կցվող փաստաթղթեր</a></li>
+                                <li><a href="@Url.Action("IdentificatorType", "Catalog")">Ա.Հ.Փ. տեսակներ</a></li>
+                                <li><a href="@Url.Action("InitiationType", "Catalog")">Ուղեգրման դիմումի տեսակներ</a></li>
+                                <li><a href="@Url.Action("InvocationStatus", "Catalog")">Ուղեգրման դիմումի կարգավիճակ</a></li>
+                                <li><a href="@Url.Action("Outcome", "Catalog")">Հիվանդության ելքեր</a></li>
+                                <li><a href="@Url.Action("ReferralPurpose", "Catalog")">Ուղեգրման նպատակներ</a></li>
+                                <li><a href="@Url.Action("ReferralStatus", "Catalog")">Ուղեգրի կարգավիճակներ</a></li>
+                                <li><a href="@Url.Action("Region", "Catalog")">Մարզեր</a></li>
+                                <li><a href="@Url.Action("SocialDisease", "Catalog")">Սոցիալական հիվանդություններ</a></li>
+                                <li><a href="@Url.Action("SocialGroup", "Catalog")">Սոցկարգավիճակ</a></li>
+                                <li><a href="@Url.Action("Index", "Physician")">Բժիշկներ</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span>Գործարկողներ</span>
+                            <ul>
+                                <li><a href="@Url.Action("Index", "User")">Գործարկողների կառավարում</a></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </li>
+
+                <li><a href="@Url.Action("About", "Home")"><i class="fa fa-info"></i> Համակարգի մասին</a></li>
+            </ul>
+        </nav>
+    </div>
+
+
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    @Scripts.Render("~/bundles/site")
+    @RenderSection("Correction", required: false)
+    <script>
+        $("a[href$='#']").css("color", "#ff6a00");
+    </script>
+    <script>
+        $(function () {
+            $('#menu a').each(function () {
+                var href = $(this).attr('href');
+
+                if (window.location.href.indexOf(href) >= 0) {
+                    $(this).parent('li').addClass('mm-selected');
+                }
+            });
+            var searchContent = 'Որոնել';
+            var loginPartial = '<a href="@Url.Action("","")" style="padding:15px; display:block"><i class="fa fa-home"></i> Գլխավոր էջ</a> @Html.Partial("_LoginPartial")';
+            var menu = 'Գլխավոր մենյու';
+            var footer = '<div class="footer-copy">@DateTime.Now.Year <a href="#" target="_blank"></a><div>';
+            $('nav#menu').mmenu({
+                extensions: [
+                    'effect-menu-zoom',
+                    //"effect-panels-zoom",
+                    //"effect-listitems-drop",
+                    'shadow-page',
+                    'shadow-panels',
+                    "iconbar",
+                    "pagedim-black",
+                    "multiline"
+                ],
+                setSelected: {
+                    "hover": true
+                },
+                counters: true,
+                navbar: {
+                    title: menu
+                },
+                searchfield: {
+                    "resultsPanel": true,
+                    "showTextItems": true,
+                    "placeholder": searchContent
+                },
+                navbars: [
+                    {
+                        position: 'top',
+                        content: [loginPartial]
+                    },
+                    {
+                        position: 'top',
+                        content: ['searchfield']
+                    },
+                    {
+                        position: 'bottom',
+                        content: [
+                            footer
+                        ]
+                    }
+                ]
+            }, {
+                "searchfield": {
+                    "clear": true
+                }
+            });
+        });
+    </script>
+</body>
+</html>

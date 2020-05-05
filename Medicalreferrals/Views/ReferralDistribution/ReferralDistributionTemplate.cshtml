@@ -1,0 +1,91 @@
+﻿@model Medicalreferrals.Models.ReferralDistribution
+
+@{
+    ViewBag.Title = "Input";
+    Layout = null;
+}
+
+@using (Html.BeginForm("Save", "ReferralDistribution", FormMethod.Post, new { id = "frmReferralDistribution" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="create-item">
+        @Html.HiddenFor(model => model.ReferralDistributionId)
+        <div class="form-group">
+            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TerminationDate, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.TerminationDate, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+        <div class="form-group align-right">
+            <button id="rtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+            <button id="rtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+        </div>
+    </div>
+}
+
+<script>
+    $(".k-textbox").addClass("input-item form-control");
+    $(document).ready(function () {
+        $("#rtCancel")
+            .click(function (e) {
+                $(this).closest(".k-window-content").data("kendoWindow").close();
+                return false;
+            });
+        $("#rtSave")
+            .click(function (e) {
+
+                var validator = $("#frmReferralDistribution").kendoValidator().data("kendoValidator");
+                if (!validator.validate()) {
+                    return false;
+                }
+
+                var item = new Object();
+                item.ReferralDistributionId = '@Model.ReferralDistributionId';
+                item.StartDate = $("#StartDate").val();
+                item.TerminationDate = $("#TerminationDate").val();
+
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("Save", "ReferralDistribution")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ ReferralDistribution: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt.success != true) {
+                        alert(JSON.stringify(dt));
+                        return false;
+                    }
+                    else {
+                        if ('@Model.ReferralDistributionId' == 0) {
+                            window.location.href = '@Url.Action("Update", "ReferralDistribution")/' + dt.ReferralDistributionId;
+                        }
+                        else {
+                            $(this).closest(".k-window-content").data("kendoWindow").close();
+                        }
+                        return false;
+                    }
+                }
+                else {
+                    alert(dt);
+                    return false;
+                }
+            });
+    });
+</script>
+
+

@@ -1,0 +1,101 @@
+﻿@model Medicalreferrals.Models.ReferralOrderItem
+
+
+@{
+    ViewBag.Title = "Հերթագրման տվյալներ";
+}
+<style>
+    .referralOrder table > tbody > tr > td:nth-child(1) {
+        text-align: right;
+        width: 40%;
+    }
+
+        .referralOrder table > tbody > tr > td:nth-child(1) > label {
+            font-weight: bold !important;
+        }
+</style>
+
+
+<div id="content" class="referralOrder" style="padding:10px; margin:0 auto; width:600px;">
+    <h4>@Model.FirstName @Model.PatronymicName  @Model.LastName</h4>
+    <table class="table table-striped" style="width:580px;">
+        <tr>
+            <td>@Html.LabelFor(model => model.ReferralNumber)</td>
+            <td>@Html.DisplayFor(model => model.ReferralNumber)</td>
+        </tr>
+        @*<tr>
+                <td>@Html.LabelFor(model => model.FirstName)</td>
+                <td>@Html.DisplayFor(model => model.FirstName)</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.LastName)</td>
+                <td>@Html.DisplayFor(model => model.LastName)</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.PatronymicName)</td>
+                <td>@Html.DisplayFor(model => model.PatronymicName)</td>
+            </tr>*@
+        <tr>
+            <td>@Html.LabelFor(model => model.ReferralOrderId)</td>
+            <td>@Html.DisplayFor(model => model.ReferralOrderId)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(model => model.BirthDate)</td>
+            <td>@Html.DisplayFor(model => model.BirthDate)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(model => model.Identificator)</td>
+            <td>@Html.DisplayFor(model => model.Identificator)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(model => model.OrganizationCode)</td>
+            <td>@Html.DisplayFor(model => model.OrganizationCode)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(model => model.OrganizationName)</td>
+            <td>@Html.DisplayFor(model => model.OrganizationName)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(model => model.ReferralOrderDate)</td>
+            <td>@Html.DisplayFor(model => model.ReferralOrderDate)</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(model => model.ReferralOrderStatusName)</td>
+            <td>@Html.DisplayFor(model => model.ReferralOrderStatusName)</td>
+        </tr>
+        @*<tr>
+            <td>@Html.LabelFor(model => model.ServiceDate)</td>
+            <td>@Html.DisplayFor(model => model.ServiceDate)</td>
+        </tr>*@
+    </table>
+</div>
+<div style="padding:10px; margin:0 auto; width:600px;">
+    <button id="rtSave" class="k-button"><i class="glyphicon glyphicon-download-alt"></i> Արտահանել</button>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#rtSave")
+            .click(function () {
+                var draw = kendo.drawing;
+                draw.drawDOM($("#content"), {
+                    avoidLinks: true,
+                    paperSize: "A4"
+                })
+                .then(function (root) {
+                    return draw.exportPDF(root);
+                })
+                .done(function (data) {
+                    kendo.saveAs({
+                        dataURI: data,
+                        fileName: '@Model.ReferralId'
+                    });
+                    return false;
+                });
+            });
+    }
+)
+</script>
+

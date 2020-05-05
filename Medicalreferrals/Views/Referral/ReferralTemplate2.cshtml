@@ -1,0 +1,574 @@
+﻿@model Medicalreferrals.Models.Referral
+
+@{
+    ViewBag.Title = "Մատուցված ծառայություններ";
+}
+
+<style>
+    table {
+        max-width: 600px;
+    }
+ table > tbody > tr > td:nth-child(1) {
+        text-align: right;
+        width: 40%;
+    }
+
+table > tbody > tr > td:nth-child(1) {
+            font-weight: bold !important;
+        }
+</style>
+
+@using (Html.BeginForm("Save", "ReferralService", FormMethod.Post, new { id = "residentForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="create-item">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.ReferralId)
+
+        <div class="container">
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>1. Քաղաքացի</legend>
+                    <h2>@Html.DisplayFor(model => model.FirstName)
+                    @Html.DisplayFor(model => model.PatronymicName)
+                    @Html.DisplayFor(model => model.LastName)</h2>
+                    <table class="table table-striped">
+                        @*<tr class="success">
+                            <td>@Html.DisplayNameFor(model => model.FirstName)</td>
+                            <td>
+                                
+                            </td>
+                        </tr>*@
+                        <tr>
+                            <td>@Html.DisplayNameFor(model => model.BirthDate)</td>
+                            <td>@Html.DisplayFor(model => model.BirthDate)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayNameFor(model => model.Identificator)</td>
+                            <td>@Html.DisplayFor(model => model.Identificator)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayNameFor(model => model.Phone)</td>
+                            <td>@Html.DisplayFor(model => model.Phone)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayNameFor(model => model.ResidentMail)</td>
+                            <td>@Html.DisplayFor(model => model.ResidentMail)</td>
+                        </tr>
+                    </table>
+
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.DiagnoseId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.DiagnoseId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbDiagnoses)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.DiagnoseId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.OutcomeId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.OutcomeId)
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbOutcomes)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.OutcomeId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TerminationDate, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.TerminationDate, new { @class = "control-label" })
+                        </div>
+                    </div>
+
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    @(Html.Kendo().TabStrip()
+          .Name("aaa")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Ծառայություններ").Content(@<text>@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralService>(Model.ReferralServices)
+              .Name("Service")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.ReferralServiceId).Hidden();
+                  columns.Bound(product => product.ServiceCode);
+                  columns.Bound(product => product.ServiceName);
+                  columns.Bound(product => product.ServiceCount);
+                  columns.Bound(product => product.ServiceCost);
+                  columns.Bound(product => product.ReferralServiceDate);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել");
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.ReferralServiceId);
+                        model.Field(product => product.ReferralServiceId).Editable(false);
+                    })
+                    .Read(read => read.Action("ReferralServiceRead", "Referral", new { id = @Model.ReferralId }))
+              )
+
+              .Scrollable()
+              .Resizable(resize => resize.Columns(true))
+                                  .Reorderable(reorder => reorder.Columns(true))
+                                  .Pageable()
+                                  .HtmlAttributes(new { style = "max-height: 250px;" })
+        )
+        </text>);
+          items.Add().Text("Հետազոտություններ").Content(@<text>@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralExamination>(Model.ReferralExaminations)
+              .Name("Examination")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.ReferralExaminationId).Hidden();
+                  columns.Bound(product => product.ExaminationCode);
+                  columns.Bound(product => product.ExaminationName);
+                  columns.Bound(product => product.ExaminationCount);
+                  columns.Bound(product => product.ExaminationCost);
+                  columns.Bound(product => product.ReferralExaminationDate);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել");
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.ReferralExaminationId);
+                        model.Field(product => product.ReferralExaminationId).Editable(false);
+                    })
+                    .Read(read => read.Action("ReferralExaminationRead", "Referral", new { id = @Model.ReferralId }))
+              )
+              .Scrollable()
+              .Resizable(resize => resize.Columns(true))
+                                  .Reorderable(reorder => reorder.Columns(true))
+                                  .Pageable()
+                                  .HtmlAttributes(new { style = "max-height: 250px;" })
+        )
+        </text>);
+          items.Add().Text("Պրոցեդուրաներ").Content(@<text>@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralProcedure>(Model.ReferralProcedures)
+              .Name("Procedure")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.ReferralProcedureId).Hidden();
+                  columns.Bound(product => product.ProcedureCode);
+                  columns.Bound(product => product.ProcedureName);
+                  columns.Bound(product => product.ProcedureCount);
+                  columns.Bound(product => product.ProcedureCost);
+                  columns.Bound(product => product.ReferralProcedureDate);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել");
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.ReferralProcedureId);
+                        model.Field(product => product.ReferralProcedureId).Editable(false);
+                    })
+                    .Read(read => read.Action("ReferralProcedureRead", "Referral", new { id = @Model.ReferralId }))
+              )
+              .Scrollable()
+              .Resizable(resize => resize.Columns(true))
+                                  .Reorderable(reorder => reorder.Columns(true))
+                                  .Pageable()
+                                  .HtmlAttributes(new { style = "max-height: 250px;" })
+        )
+        </text>);
+              items.Add().Text("Միջամտություններ").Content(@<text>@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralSurgery>(Model.ReferralSurgeries)
+              .Name("Surgery")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.ReferralSurgeryId).Hidden();
+                  columns.Bound(product => product.SurgeryCode);
+                  columns.Bound(product => product.SurgeryName);
+                  columns.Bound(product => product.SurgeryCount);
+                  columns.Bound(product => product.SurgeryCost);
+                  columns.Bound(product => product.ReferralSurgeryDate);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել");
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.ReferralSurgeryId);
+                        model.Field(product => product.ReferralSurgeryId).Editable(false);
+                    })
+                    .Read(read => read.Action("ReferralSurgeryRead", "Referral", new { id = @Model.ReferralId }))
+              )
+              .Scrollable()
+              .Resizable(resize => resize.Columns(true))
+                                  .Reorderable(reorder => reorder.Columns(true))
+                                  .Pageable()
+                                  .HtmlAttributes(new { style = "max-height: 250px;" })
+            )
+            </text>);
+              items.Add().Text("Խորհրադատվություն").Content(@<text>@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralConsultation>(Model.ReferralConsultations)
+              .Name("Consultation")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.ReferralConsultationId).Hidden();
+                  columns.Bound(product => product.ConsultationCode);
+                  columns.Bound(product => product.ConsultationName);
+                  columns.Bound(product => product.ConsultationCost);
+                  columns.Bound(product => product.ReferralConsultationDate);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել");
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.ReferralConsultationId);
+                        model.Field(product => product.ReferralConsultationId).Editable(false);
+                    })
+                    .Read(read => read.Action("ReferralConsultationRead", "Referral", new { id = @Model.ReferralId }))
+              )
+              .Scrollable()
+              .Resizable(resize => resize.Columns(true))
+                                  .Reorderable(reorder => reorder.Columns(true))
+                                  .Pageable()
+                                  .HtmlAttributes(new { style = "max-height: 250px;" })
+            )
+            </text>);
+          })
+                    )
+                </fieldset>
+            </div>
+            <dir class="row">
+                <div class="col-sm-12 border-box align-right margin-10-0">
+                    <div class="form-group">
+                        <button id="rtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+                        <button id="rtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+                    </div>
+                </div>
+            </dir>    
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        $("#SocialBenefitDescription").attr("placeholder", "հավաստագրի համարը");
+        $(".k-textbox").addClass("input-item");
+
+        $("#rtCancel")
+            .click(function () {
+                window.location.href = '@Url.Action("Index4", "Referral")';
+                return false;
+            });
+        $("#rtSave")
+            .click(function (e) {
+                var item = new Object();
+                item.ReferralId = '@Model.ReferralId';
+                item.ReferralStatusId = '@Model.ReferralStatusId';
+                item.ConformationDate = '@Model.ConformationDate';
+                item.ConfirmationDate = '@Model.ConfirmationDate';
+                item.DocumentGuid = '@Model.DocumentGuid';
+                item.DocumentURL = '@Model.DocumentURL';
+                item.ReferralDate = '@Model.ReferralDate';
+
+                item.FirstName = $("#FirstName").val();
+                item.LastName = $("#LastName").val();
+                item.PatronymicName = $("#PatronymicName").val();
+                item.BirthDate = $("#BirthDate").val();
+                item.DiagnoseId = $("#DiagnoseId").val();
+                item.OutcomeId = $("#OutcomeId").val();
+                item.TerminationDate = $("#TerminationDate").val();
+
+                var serviceGrid = $("#Service").data("kendoGrid"), parameterMap = serviceGrid.dataSource.transport.parameterMap;
+                var currentData = serviceGrid.dataSource.data();
+                var rServices = [];
+                for (var i = 0; i < currentData.length; i++) {
+                    var itm = new Object();
+                    if (currentData[i].isNew()) {
+                        itm.ReferralServiceId = currentData[i].ReferralServiceId;
+                        itm.ServiceCode = currentData[i].ServiceCode;
+                        itm.ServiceName = currentData[i].ServiceName;
+                        itm.ServiceCount = currentData[i].ServiceCount;
+                        itm.ServiceCost = currentData[i].ServiceCost;
+                        itm.ReferralServiceDate = currentData[i].ReferralServiceDate;
+                        itm.RecordStatus = String(1);
+                        rServices.push(itm);
+                    } else if (currentData[i].dirty) {
+                        itm.ReferralServiceId = currentData[i].ReferralServiceId;
+                        itm.ServiceCode = currentData[i].ServiceCode;
+                        itm.ServiceName = currentData[i].ServiceName;
+                        itm.ServiceCount = currentData[i].ServiceCount;
+                        itm.ServiceCost = currentData[i].ServiceCost;
+                        itm.ReferralServiceDate = currentData[i].ReferralServiceDate;
+                        itm.RecordStatus = String(2);
+                        rServices.push(itm);
+                    }
+                }
+                for (var i = 0; i < serviceGrid.dataSource._destroyed.length; i++) {
+                    var itm = new Object();
+                    itm.ReferralServiceId = serviceGrid.dataSource._destroyed[i].ReferralServiceId;
+                    itm.ServiceCode = serviceGrid.dataSource._destroyed[i].ServiceCode;
+                    itm.ServiceName = serviceGrid.dataSource._destroyed[i].ServiceName;
+                    itm.ServiceCount = serviceGrid.dataSource._destroyed[i].ServiceCount;
+                    itm.ServiceCost = serviceGrid.dataSource._destroyed[i].ServiceCost;
+                    itm.ReferralServiceDate = serviceGrid.dataSource._destroyed[i].ReferralServiceDate;
+                    itm.RecordStatus = String(3);
+                    rServices.push(itm);
+                }
+                item.ReferralServices = rServices;
+
+
+                var examinationGrid = $("#Examination").data("kendoGrid"), parameterMap = examinationGrid.dataSource.transport.parameterMap;
+                var currentExaminationData = examinationGrid.dataSource.data();
+                var rExaminations = [];
+                for (var i = 0; i < currentExaminationData.length; i++) {
+                    var itm = new Object();
+                    if (currentExaminationData[i].isNew()) {
+                        itm.ReferralExaminationId = currentExaminationData[i].ReferralServiceId;
+                        itm.ExaminationCode = currentExaminationData[i].ExaminationCode;
+                        itm.ExaminationName = currentExaminationData[i].ExaminationName;
+                        itm.ExaminationCount = currentExaminationData[i].ExaminationCount;
+                        itm.ExaminationCost = currentExaminationData[i].ExaminationCost;
+                        itm.ReferralExaminationDate = currentExaminationData[i].ReferralExaminationDate;
+                        itm.RecordStatus = String(1);
+                        rExaminations.push(itm);
+                    } else if (currentExaminationData[i].dirty) {
+                        itm.ReferralExaminationId = currentExaminationData[i].ReferralExaminationId;
+                        itm.ExaminationCode = currentExaminationData[i].ExaminationCode;
+                        itm.ExaminationName = currentExaminationData[i].ExaminationName;
+                        itm.ExaminationCount = currentExaminationData[i].ExaminationCount;
+                        itm.ExaminationCost = currentExaminationData[i].ExaminationCost;
+                        itm.ReferralExaminationDate = currentExaminationData[i].ReferralExaminationDate;
+                        itm.RecordStatus = String(2);
+                        rExaminations.push(itm);
+                    }
+                }
+                for (var i = 0; i < examinationGrid.dataSource._destroyed.length; i++) {
+                    var itm = new Object();
+                    itm.ReferralExaminationId = examinationGrid.dataSource._destroyed[i].ReferralExaminationId;
+                    itm.ExaminationCode = examinationGrid.dataSource._destroyed[i].ExaminationCode;
+                    itm.ExaminationName = examinationGrid.dataSource._destroyed[i].ExaminationName;
+                    itm.ExaminationCount = examinationGrid.dataSource._destroyed[i].ExaminationCount;
+                    itm.ExaminationCost = examinationGrid.dataSource._destroyed[i].ExaminationCost;
+                    itm.ReferralExaminationDate = examinationGrid.dataSource._destroyed[i].ReferralExaminationDate;
+                    itm.RecordStatus = String(3);
+                    rExaminations.push(itm);
+                }
+                item.ReferralExaminations = rExaminations;
+
+
+
+                var procedureGrid = $("#Procedure").data("kendoGrid"), parameterMap = procedureGrid.dataSource.transport.parameterMap;
+                var currentProcedureData = procedureGrid.dataSource.data();
+                var rProcedures = [];
+                for (var i = 0; i < currentProcedureData.length; i++) {
+                    var itm = new Object();
+                    if (currentProcedureData[i].isNew()) {
+                        itm.ReferralProcedureId = currentProcedureData[i].ReferralServiceId;
+                        itm.ProcedureCode = currentProcedureData[i].ProcedureCode;
+                        itm.ProcedureName = currentProcedureData[i].ProcedureName;
+                        itm.ProcedureCount = currentProcedureData[i].ProcedureCount;
+                        itm.ProcedureCost = currentProcedureData[i].ProcedureCost;
+                        itm.ReferralProcedureDate = currentProcedureData[i].ReferralProcedureDate;
+                        itm.RecordStatus = String(1);
+                        rProcedures.push(itm);
+                    } else if (currentProcedureData[i].dirty) {
+                        itm.ReferralProcedureId = currentProcedureData[i].ReferralProcedureId;
+                        itm.ProcedureCode = currentProcedureData[i].ProcedureCode;
+                        itm.ProcedureName = currentProcedureData[i].ProcedureName;
+                        itm.ProcedureCount = currentProcedureData[i].ProcedureCount;
+                        itm.ProcedureCost = currentProcedureData[i].ProcedureCost;
+                        itm.ReferralProcedureDate = currentProcedureData[i].ReferralProcedureDate;
+                        itm.RecordStatus = String(2);
+                        rProcedures.push(itm);
+                    }
+                }
+                for (var i = 0; i < procedureGrid.dataSource._destroyed.length; i++) {
+                    var itm = new Object();
+                    itm.ReferralProcedureId = procedureGrid.dataSource._destroyed[i].ReferralProcedureId;
+                    itm.ProcedureCode = procedureGrid.dataSource._destroyed[i].ProcedureCode;
+                    itm.ProcedureName = procedureGrid.dataSource._destroyed[i].ProcedureName;
+                    itm.ProcedureCount = procedureGrid.dataSource._destroyed[i].ProcedureCount;
+                    itm.ProcedureCost = procedureGrid.dataSource._destroyed[i].ProcedureCost;
+                    itm.ReferralProcedureDate = procedureGrid.dataSource._destroyed[i].ReferralProcedureDate;
+                    itm.RecordStatus = String(3);
+                    rProcedures.push(itm);
+                }
+                item.ReferralProcedures = rProcedures;
+
+
+                var surgeryGrid = $("#Surgery").data("kendoGrid"), parameterMap = surgeryGrid.dataSource.transport.parameterMap;
+                var currentSurgeryData = surgeryGrid.dataSource.data();
+                var rSurgeries = [];
+                for (var i = 0; i < currentSurgeryData.length; i++) {
+                    var itm = new Object();
+                    if (currentSurgeryData[i].isNew()) {
+                        itm.ReferralSurgeryId = currentSurgeryData[i].ReferralServiceId;
+                        itm.SurgeryCode = currentSurgeryData[i].SurgeryCode;
+                        itm.SurgeryName = currentSurgeryData[i].SurgeryName;
+                        itm.SurgeryCount = currentSurgeryData[i].SurgeryCount;
+                        itm.SurgeryCost = currentSurgeryData[i].SurgeryCost;
+                        itm.ReferralSurgeryDate = currentSurgeryData[i].ReferralSurgeryDate;
+                        itm.RecordStatus = String(1);
+                        rSurgeries.push(itm);
+                    } else if (currentSurgeryData[i].dirty) {
+                        itm.ReferralSurgeryId = currentSurgeryData[i].ReferralSurgeryId;
+                        itm.SurgeryCode = currentSurgeryData[i].SurgeryCode;
+                        itm.SurgeryName = currentSurgeryData[i].SurgeryName;
+                        itm.SurgeryCount = currentSurgeryData[i].SurgeryCount;
+                        itm.SurgeryCost = currentSurgeryData[i].SurgeryCost;
+                        itm.ReferralSurgeryDate = currentSurgeryData[i].ReferralSurgeryDate;
+                        itm.RecordStatus = String(2);
+                        rSurgeries.push(itm);
+                    }
+                }
+                for (var i = 0; i < surgeryGrid.dataSource._destroyed.length; i++) {
+                    var itm = new Object();
+                    itm.ReferralSurgeryId = surgeryGrid.dataSource._destroyed[i].ReferralSurgeryId;
+                    itm.SurgeryCode = surgeryGrid.dataSource._destroyed[i].SurgeryCode;
+                    itm.SurgeryName = surgeryGrid.dataSource._destroyed[i].SurgeryName;
+                    itm.SurgeryCount = surgeryGrid.dataSource._destroyed[i].SurgeryCount;
+                    itm.SurgeryCost = surgeryGrid.dataSource._destroyed[i].SurgeryCost;
+                    itm.ReferralSurgeryDate = surgeryGrid.dataSource._destroyed[i].ReferralSurgeryDate;
+                    itm.RecordStatus = String(3);
+                    rSurgeries.push(itm);
+                }
+                item.ReferralSurgeries = rSurgeries;
+
+
+                var consultationGrid = $("#Consultation").data("kendoGrid"), parameterMap = consultationGrid.dataSource.transport.parameterMap;
+                var currentConsultationData = consultationGrid.dataSource.data();
+                var rConsultations = [];
+                for (var i = 0; i < currentConsultationData.length; i++) {
+                    var itm = new Object();
+                    if (currentConsultationData[i].isNew()) {
+                        itm.ReferralConsultationId = currentConsultationData[i].ReferralServiceId;
+                        itm.ConsultationCode = currentConsultationData[i].ConsultationCode;
+                        itm.ConsultationName = currentConsultationData[i].ConsultationName;
+                        itm.ConsultationCount = currentConsultationData[i].ConsultationCount;
+                        itm.ConsultationCost = currentConsultationData[i].ConsultationCost;
+                        itm.ReferralConsultationDate = currentConsultationData[i].ReferralConsultationDate;
+                        itm.RecordStatus = String(1);
+                        rConsultations.push(itm);
+                    } else if (currentConsultationData[i].dirty) {
+                        itm.ReferralConsultationId = currentConsultationData[i].ReferralConsultationId;
+                        itm.ConsultationCode = currentConsultationData[i].ConsultationCode;
+                        itm.ConsultationName = currentConsultationData[i].ConsultationName;
+                        itm.ConsultationCount = currentConsultationData[i].ConsultationCount;
+                        itm.ConsultationCost = currentConsultationData[i].ConsultationCost;
+                        itm.ReferralConsultationDate = currentConsultationData[i].ReferralConsultationDate;
+                        itm.RecordStatus = String(2);
+                        rConsultations.push(itm);
+                    }
+                }
+                for (var i = 0; i < consultationGrid.dataSource._destroyed.length; i++) {
+                    var itm = new Object();
+                    itm.ReferralConsultationId = consultationGrid.dataSource._destroyed[i].ReferralConsultationId;
+                    itm.ConsultationCode = consultationGrid.dataSource._destroyed[i].ConsultationCode;
+                    itm.ConsultationName = consultationGrid.dataSource._destroyed[i].ConsultationName;
+                    itm.ConsultationCount = consultationGrid.dataSource._destroyed[i].ConsultationCount;
+                    itm.ConsultationCost = consultationGrid.dataSource._destroyed[i].ConsultationCost;
+                    itm.ReferralConsultationDate = consultationGrid.dataSource._destroyed[i].ReferralConsultationDate;
+                    itm.RecordStatus = String(3);
+                    rConsultations.push(itm);
+                }
+                item.ReferralConsultations = rConsultations;
+
+                //alert(JSON.stringify({ referral: item }));
+
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("SaveReferral2", "Referral")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ rItem: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+
+                        dt = data;
+                        rt = true;
+                        window.location.href = '@Url.Action("Index4", "Referral")';
+                    },
+                    error: function (xhr) {
+                        window.location.href = '@Url.Action("Index4", "Referral")';
+                        return false;
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt != "1") {
+                        alert(JSON.stringify(dt));
+                    }
+                    else {
+                        if ($(this).closest(".k-window-content").data("kendoWindow"))
+                            $(this).closest(".k-window-content").data("kendoWindow").close();
+                    }
+                }
+                else {
+                    //alert(JSON.stringify(dt));
+                    return false;
+                }
+            });
+    });
+</script>

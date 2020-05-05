@@ -1,0 +1,244 @@
+﻿@model IEnumerable<Medicalreferrals.Models.ReferralOrderItem>
+
+@{
+    ViewBag.Title = "Հերթագրման նախապատրաստում";
+}
+
+<div class="for-Toolbar">
+    @(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Նոր հերթագրում").Id("btnInsert").Click("CreateReferralOrder");
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Ներկայացնել բավարարման").Id("btnRequestConfirm").Click("RequestConfirmReferralOrder");
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Տպել կտրոն").Id("btnDetail").Click("ShowDetail");
+    })
+    )
+
+    <div class="right-slidePanel">
+        <div class="slidePanel-Content">
+            <div class="slidePanel-btn">
+            </div>
+            <div class="slidePanel-Content-fields create-item">
+                <h4>Հերթագրման որոնում</h4>
+                <div class="form-group margin-5-0">
+                    <input id="prmReferralNumber" class="input-item k-textbox" placeholder="Ուղեգրի համար" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmReferralOrderId" class="input-item k-textbox" placeholder="Հերթագրման համար" />
+                </div>
+                <div class="form-group btns align-right">
+                    <button type="submit" id="rtSearch" class="k-button" onclick="return Search();"><i class="glyphicon glyphicon-search"></i> Որոնել</button>
+                    <button type="submit" class="k-button" onclick="return Clear();"><i class="glyphicon glyphicon-minus"></i> Մաքրել</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function Search() {
+        $("#ReferralOrder").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function Clear() {
+        $("#prmReferralNumber").val("");
+        $("#prmReferralOrderId").val("");
+        $("#ReferralOrder").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function getParameter() {
+        return {
+            referralNumber: $("#prmReferralNumber").val(),
+            referralOrderId: $("#prmReferralOrderId").val(),
+        };
+    }
+</script>
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralOrderItem>()
+      .Name("ReferralOrder")
+      .Events(events => events.DataBound("onReferralOrderDataBound"))
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.ReferralOrderId);
+          columns.Bound(model => model.ReferralId).Hidden();
+          columns.Bound(model => model.ReferralNumber);
+          columns.Bound(model => model.FirstName);
+          columns.Bound(model => model.LastName);
+          columns.Bound(model => model.PatronymicName);
+          columns.Bound(model => model.BirthDate).Width(115);
+          columns.Bound(model => model.ReferralOrderDate).Width(142);
+          columns.Bound(model => model.ConfirmOrderDate).Width(142);
+          columns.Bound(model => model.ReferralOrderStatusName).Width(142);
+          columns.Bound(model => model.ConfirmationDate);
+          columns.Bound(model => model.ValidityDate);
+          columns.Command(commands =>
+          {
+              commands.Custom("cmdUpdateReferralOrder").Text(" ").Click("UpdateReferralOrder").HtmlAttributes(new { @class = "Update_Icon" });
+              commands.Custom("cmdDeleteReferralOrder").Text(" ").Click("DeleteReferralOrder").HtmlAttributes(new { @class = "Delete_Icon" });
+          }).Title("Հրահանգներ").Width(130);
+      })
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Scrollable()
+      .Sortable()
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadReferralOrders1", "ReferralOrder").Data("getParameter"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("ReferralId").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.ReferralId);
+          }
+          )
+)
+)
+
+@(Html.Kendo().Window().Name("wReferralOrder")
+        .Width(500).Height(270)
+              .Draggable().Resizable()
+              .Content("").Modal(true).Actions(actions => actions.Pin().Close())
+              .Visible(false).Events(events => events
+              .Close("onCloseReferralOrder")
+              .Open("onOpenReferralOrder")
+              .Refresh("onRefreshReferralOrder"))
+)
+
+
+<script>
+    //$("#wReferralOrder").kendoWindow({
+    //    width: "95%",
+    //    height: "85%"
+
+    //});
+
+    function onReferralOrderDataBound(e) {
+        showCommandIcons();
+    }
+
+    function CreateReferralOrder() {
+        window.location.href = '@Url.Action("CreateReferralOrder", "ReferralOrder")';
+        return false;
+    }
+
+    function UpdateReferralOrder(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#ReferralOrder").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var window = $("#wReferralOrder").data("kendoWindow");
+        window.content("");
+        window.title("Խմբագրել");
+        window.refresh({
+            url: "@Url.Action("ReferralOrderTemplate", "ReferralOrder")" + "?Id=" + dataItem.ReferralOrderId + "&referralId=" + dataItem.ReferralId
+        });
+        window.center();
+        window.open();
+        return false;
+    }
+
+    function DeleteReferralOrder(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#ReferralOrder").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var r = confirm("Ցանկանում էք հեռացնել գրառումը՞:");
+        if (r == false) {
+            return false;
+        }
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("DeleteReferralOrder", "ReferralOrder")',
+            dataType: "json",
+            type: "GET",
+            data: { id: dataItem.ReferralOrderId },
+            async: false,
+            success: function (data) { dt = data; rt = true; },
+            error: function (xhr) { dt = xhr; rt = false; }
+        });
+        if (rt == true) {
+            if (dt.success != true) {
+                alert(JSON.stringify(dt));
+                return false;
+            }
+            else {
+                $("#ReferralOrder").data("kendoGrid").dataSource.read();
+            }
+        }
+        else {
+            alert(dt);
+            return false;
+        }
+        return false;
+    }
+
+    function RequestConfirmReferralOrder() {
+
+        var grid = $("#ReferralOrder").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+
+        if (selectedItem == null) {
+            alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+            return false;
+        }
+
+        if (selectedItem.ReferralOrderStatusId != 1) {
+            alert("Հաստատման կարելի է ներկայացնել միայն այն գրառումը, որն ունի «Նախապատրաստվող» կարգավիճակ:");
+            return false;
+        }
+
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("RequestConfirmReferralOrder", "ReferralOrder")',
+            dataType: "json",
+            type: "GET",
+            data: { id: selectedItem.ReferralOrderId },
+            async: false,
+            success: function (data) { dt = data; rt = true; },
+            error: function (xhr) { dt = xhr; rt = false; }
+        });
+
+        if (rt == true) {
+            if (dt.statuscode == 1) {
+                $("#ReferralOrder").data("kendoGrid").dataSource.read();
+                alert(dt.message);
+            }
+            else {
+                alert(dt.message);
+            }
+        }
+        else {
+            alert("Չբացահայտված տեխնիկական սխալ:");
+        }
+        return false;
+    }
+
+    function ShowDetail() {
+        var grid = $("#ReferralOrder").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+        if (selectedItem == null) {
+            alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+            return false;
+        };
+        window.open('@Url.Action("ReferralOrderDetail", "ReferralOrder")/' + selectedItem.ReferralOrderId);
+        return false;
+    }
+
+    function onOpenReferralOrder(e) {
+        kendo.ui.progress(e.sender.element, true);
+    }
+    function onCloseReferralOrder(e) {
+        $("#ReferralOrder").data("kendoGrid").dataSource.read();
+        $(".k-overlay").css("display", "none");
+    }
+    function onRefreshReferralOrder(e) {
+        kendo.ui.progress(e.sender.element, false);
+    }
+
+</script>

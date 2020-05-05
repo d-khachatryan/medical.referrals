@@ -1,0 +1,47 @@
+﻿@model Microsoft.AspNet.Identity.EntityFramework.IdentityRole
+
+@{
+    ViewBag.Title = "...";
+}
+<h2>...</h2>
+
+
+@using (Html.BeginForm(new { roleName = ViewBag.vbRoleName, searchString = ViewBag.vbSearchString, page = ViewBag.vbpage, sortOrder = ViewBag.vbsortOrder }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            <label class="col-md-3 control-label">...</label>
+            <div class="col-md-9">
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-3 col-md-9">
+                <button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-floppy-disk"></i>...</button>
+            </div>
+        </div>
+    </div>
+
+    @*<div>
+        Role name
+    </div>
+    <p>
+        @Html.TextBoxFor(model => model.Name)
+    </p>
+    <input type="submit" value="Save" />
+    <input type="button" value="Cancel" onclick="location.href='@Url.Action("Index","Roles", new { roleName = ViewBag.vbRoleName, searchString = ViewBag.vbSearchString, page = ViewBag.vbpage, sortOrder = ViewBag.vbsortOrder })';" />*@
+}
+<div>
+    <a href="@Url.Action("Index", new { roleName = ViewBag.vbRoleName, searchString = ViewBag.vbSearchString})" class="btn btn-info">
+        <i class="glyphicon glyphicon-arrow-left"></i> ...
+    </a>
+</div>
+
+@section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }

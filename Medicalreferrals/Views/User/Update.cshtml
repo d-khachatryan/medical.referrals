@@ -1,0 +1,100 @@
+﻿@model Medicalreferrals.Models.UserItem
+
+@{
+    Layout = null;
+}
+
+<div class="create-item">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Id)
+    <div class="col-sm-12 border-box">
+        <div class="form-group margin-10-0">
+            @Html.LabelFor(model => model.UserName, new { @class = "control-label" })
+            @Html.Kendo().TextBoxFor(model => model.UserName)
+            @Html.ValidationMessageFor(model => model.UserName, null, new { @class = "text-danger" })
+        </div>
+        <div class="form-group margin-10-0">
+            @*@Html.LabelFor(model => model.FirstName, new { @class = "control-label" })*@
+            <label class="control-label" for="FirstName">Անուն</label>
+            @Html.Kendo().TextBoxFor(model => model.FirstName)
+            @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "text-danger" })
+        </div>
+        <div class="form-group margin-10-0">
+            @*@Html.LabelFor(model => model.LastName, new { @class = "control-label" })*@
+            <label class="control-label" for="LastName">Ազգանուն</label>
+            @Html.Kendo().TextBoxFor(model => model.LastName)
+            @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "text-danger" })
+        </div>
+        <div class="form-group margin-10-0">
+            @*@Html.LabelFor(model => model.PositionName, new { @class = "control-label" })*@
+            <label class="control-label" for="PositionName">Պաշտոն</label>
+            @Html.Kendo().TextBoxFor(model => model.PositionName)
+            @Html.ValidationMessageFor(model => model.PositionName, null, new { @class = "text-danger" })
+        </div>
+        <div class="form-group margin-10-0">
+            @Html.LabelFor(model => model.Email, new { @class = "control-label" })
+            @Html.Kendo().TextBoxFor(model => model.Email)
+            @Html.ValidationMessageFor(model => model.Email, null, new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="col-sm-12 border-box align-right margin-20-0">
+        <div class="form-group">
+            <button id="rsdtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+            <button id="rsdtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#rsdtCancel")
+            .click(function () {
+                if ($(this).closest(".k-window-content").data("kendoWindow"))
+                    $(this).closest(".k-window-content").data("kendoWindow").close();
+            });
+        $("#rsdtSave")
+            .click(function (e) {
+
+                var item = new Object();
+                item.Id = '@Model.Id';
+                item.UserName = $("#UserName").val();
+                item.Email = $("#Email").val();
+                item.FirstName = $("#FirstName").val();
+                item.LastName = $("#LastName").val();
+                item.PositionName = $("#PositionName").val();
+
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("Update", "User")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ user: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt != "1") {
+                        alert(JSON.stringify(dt));
+                    }
+                    else {
+                        if ($(this).closest(".k-window-content").data("kendoWindow"))
+                            $(this).closest(".k-window-content").data("kendoWindow").close();
+                    }
+                }
+                else {
+                    alert(dt);
+                    return false;
+                }
+            });
+    });
+</script>

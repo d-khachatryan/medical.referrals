@@ -1,0 +1,13 @@
+﻿@{
+    Layout = null;
+}
+
+@(Html.Kendo().ComboBox()
+                    .Name("BudgetLineId")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbBudgetLines)
+                    .HtmlAttributes(new { data_value_primitive = true})
+)
+

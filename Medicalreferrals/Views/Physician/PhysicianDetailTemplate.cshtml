@@ -1,0 +1,32 @@
+﻿@model Medicalreferrals.Models.PhysicianItem
+
+@{
+    Layout = null;
+    ViewBag.Title = Model.FirstName + "" + Model.LastName;
+}
+
+<table class="table table-striped">
+    <tr class="success">
+        <td>@Html.DisplayNameFor(model => model.PhysicianCode)</td>
+        <td>@Html.DisplayFor(model => model.PhysicianCode)</td>
+    </tr>
+    <tr>
+        <td>@Html.DisplayNameFor(model => model.FirstName)</td>
+        <td>@Html.DisplayFor(model => model.FirstName)</td>
+    </tr>
+    <tr>
+        <td>@Html.DisplayNameFor(model => model.LastName)</td>
+        <td>@Html.DisplayFor(model => model.LastName)</td>
+    </tr>
+    <tr>
+        <td>@Html.DisplayNameFor(model => model.PatronymicName)</td>
+        <td>@Html.DisplayFor(model => model.PatronymicName)</td>
+    </tr>
+    <tr>
+        <td>@Html.DisplayNameFor(model => model.OrganizationName)</td>
+        <td>@Html.DisplayFor(model => model.OrganizationName)</td>
+    </tr>
+</table>
+
+
+

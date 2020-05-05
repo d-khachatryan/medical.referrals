@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Սոցիալական հիվանդություններ";
+}
+@(Html.Kendo().Grid<Medicalreferrals.Models.SocialDisease>()
+              .Name("SocialDisease")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.SocialDiseaseId).Width(70);
+                  columns.Bound(product => product.SocialDiseaseCode);
+                  columns.Bound(product => product.SocialDiseaseName);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել").HtmlAttributes(new { @class = "Cat_Delete_Icon" });
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+                  toolbar.Save().SaveText("Հիշել").CancelText("Ընդհատել");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.SocialDiseaseId);
+                        model.Field(product => product.SocialDiseaseId).Editable(false);
+                    })
+                    .Create(create => create.Action("SocialDiseaseCreate", "Catalog"))
+                    .Read(read => read.Action("SocialDiseaseRead", "Catalog"))
+                    .Update(update => update.Action("SocialDiseaseUpdate", "Catalog"))
+                    .Destroy(destroy => destroy.Action("SocialDiseaseDestroy", "Catalog"))
+              )
+              .Pageable()
+              .HtmlAttributes(new { @class = "catalog-grid" })
+              .Scrollable()
+)
+

@@ -1,0 +1,260 @@
+﻿@model IEnumerable<Medicalreferrals.Models.BudgetItem>
+
+@{
+    ViewBag.Title = "Բյուջեներ";
+}
+
+<script type="text/javascript">
+    $(document)
+        .ready(function () {
+            currentBudgetIndex = -1;
+        });
+
+</script>
+
+@(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Նոր Գրառում").Id("btnInsert").Click("CreateBudget");
+    })
+)
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.BudgetItem>()
+      .Name("Budget")
+      .Events(events => events.DataBound("onBudgetDataBound").DetailExpand("onBudgetDetailExpand"))
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.BudgetId);
+          columns.Bound(model => model.StartDate);
+          columns.Bound(model => model.TerminationDate);
+          columns.Bound(model => model.IsClosed).Hidden();
+          columns.Bound(model => model.Id).Hidden();
+          columns.Command(commands =>
+          {
+              commands.Custom("cmdUpdateBudget").Text(" ").Click("UpdateBudget").HtmlAttributes(new { @class = "Update_Icon" });
+              commands.Custom("cmdDeleteBudget").Text(" ").Click("DeleteBudget").HtmlAttributes(new { @class = "Delete_Icon" });
+          }).Title("Հրահանգներ").Width(130);
+      })
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Scrollable()
+      .Sortable()
+      .HtmlAttributes(new { style = "height:620px;" })
+      .ClientDetailTemplateId("template")
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadBudgetItems", "Budget"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("BudgetId").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.BudgetId);
+          }
+          )
+)
+)
+
+@(Html.Kendo().Window().Name("wBudget")
+              .Width(350)
+              .Height(200)
+              .Draggable().Resizable()
+              .Content("").Modal(true).Actions(actions => actions.Pin().Close())
+              .Visible(false).Events(events => events
+              .Close("onCloseBudget")
+              .Open("onOpenBudget")
+              .Refresh("onRefreshBudget"))
+)
+
+<script>
+
+    function onBudgetDataBound(e) {
+        showCommandIcons();
+        if (currentBudgetIndex != -1) {
+            var row = $(this.tbody).find("tr.k-master-row:eq(" + currentBudgetIndex + ")");
+            this.expandRow(row);
+        }
+    }
+
+    function onBudgetDetailExpand(e) {
+        currentBudgetIndex = $(e.masterRow).index(".k-master-row");
+        var selectedItem = this.dataItem(e.masterRow);
+        BID = selectedItem.BudgetId;
+        this.collapseRow(this.tbody.find(' > tr.k-master-row').not(e.masterRow));
+    }
+
+    function CreateBudget() {
+        var window = $("#wBudget").data("kendoWindow");
+        window.content("");
+        window.title("Նոր գրառում");
+        window.refresh({
+            url: "@Url.Action("Create", "Budget")"
+        });
+        window.center();
+        window.open();
+        return false;
+    }
+
+    function UpdateBudget(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#Budget").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        window.location.href = '@Url.Action("Update", "Budget")/' + dataItem.BudgetId;
+        return false;
+    }
+
+    function DeleteBudget(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#Budget").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var r = confirm("Ցանկանում էք հեռացնել գրառումը՞:");
+        if (r == false) {
+            return false;
+        }
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("Delete", "Budget")',
+            dataType: "json",
+            type: "GET",
+            data: {
+                id: dataItem.BudgetId
+            },
+            async: false,
+            success: function (data) {
+                dt = data;
+                rt = true;
+            },
+            error: function (xhr) {
+                dt = xhr;
+                rt = false;
+            }
+        });
+        if (rt == true) {
+            if (dt.success != true) {
+                alert(JSON.stringify(dt));
+                return false;
+            }
+            else {
+                $("#Budget").data("kendoGrid").dataSource.read();
+                return false;
+            }
+        }
+        else {
+            alert(dt);
+            return false;
+        }
+    }
+
+    function onOpenBudget(e) {
+        kendo.ui.progress(e.sender.element, true);
+    }
+    function onCloseBudget(e) {
+        $("#Budget").data("kendoGrid").dataSource.read();
+        $(".k-overlay").css("display", "none");
+    }
+    function onRefreshBudget(e) {
+        kendo.ui.progress(e.sender.element, false);
+    }
+
+</script>
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+          .Name("tabStrip_#=BudgetId#")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Հիմնարկներ").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.BudgetOrganizationItem>()
+              .Name("Organization_#=BudgetId#")
+              .Events(e => e.DataBound("showCommandIcons"))
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.BudgetOrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationCode).Width(92);
+                  columns.Bound(model => model.OrganizationName).Width(284);
+                  columns.Bound(model => model.BudgetLineCode).Width(120);
+                  columns.Bound(model => model.BudgetLineName).Width(327);
+                  columns.Bound(model => model.BudgetCost).Width(133);
+                  columns.Bound(model => model.Budget1).Width(98);
+                  columns.Bound(model => model.Budget2).Width(98);
+                  columns.Bound(model => model.Budget3).Width(98);
+                  columns.Bound(model => model.ChangeDate).Width(120);
+                  columns.Bound(model => model.ChangeBaseName).Width(157);
+              })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadBudgetOrganizationItems", "Budget", new { id = "#=BudgetId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.BudgetOrganizationId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .ClientDetailTemplateId("template2")
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+          })
+            .ToClientTemplate())
+</script>
+
+<script id="template2" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+          .Name("tabStrip_#=BudgetOrganizationId#")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Փոփոխություններ").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.BudgetOrganizationLogItem>()
+              .Name("Organization_#=BudgetOrganizationId#")
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.BudgetOrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationCode).Width(92);
+                  columns.Bound(model => model.OrganizationName).Width(284);
+                  columns.Bound(model => model.BudgetLineCode).Width(120);
+                  columns.Bound(model => model.BudgetLineName).Width(327);
+                  columns.Bound(model => model.BudgetCost).Width(133);
+                  columns.Bound(model => model.Budget1).Width(98);
+                  columns.Bound(model => model.Budget2).Width(98);
+                  columns.Bound(model => model.Budget3).Width(98);
+                  columns.Bound(model => model.ChangeDate).Width(120);
+                  columns.Bound(model => model.ChangeBaseName).Width(157);
+              })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadBudgetOrganizationLogItems", "Budget", new { id = "#=BudgetOrganizationId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.BudgetOrganizationLogId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+          })
+            .ToClientTemplate())
+</script>
+
+

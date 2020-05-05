@@ -1,0 +1,123 @@
+﻿@model Medicalreferrals.Models.ReferralOrderTemplate
+
+@{
+    ViewBag.Title = "Input";
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveReferralOrder", "ReferralOrder", FormMethod.Post, new { id = "frmReferralOrder" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="create-item">
+        @Html.HiddenFor(model => model.ReferralOrderId)
+        @Html.HiddenFor(model => model.ReferralId)
+        @Html.HiddenFor(model => model.ReferralOrderStatusId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReferralOrderDate, htmlAttributes: new { @class = "control-label" })
+                @(Html.Kendo().DatePickerFor(model => model.ReferralOrderDate)
+                            .Format("yyyy-MM-dd")
+                            .Min(@Model.ConfirmationDate.ToString()).Max(@Model.ValidityDate.ToString())
+                            .HtmlAttributes(new { @class = "input-item" })
+                )
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfirmOrderDate, htmlAttributes: new { @class = "control-label" })
+
+                @(Html.Kendo().DatePickerFor(model => model.ConfirmOrderDate)
+                            .Format("yyyy-MM-dd")
+                            .Min(@Model.ConfirmationDate.ToString()).Max(@Model.ValidityDate.ToString())
+                            .HtmlAttributes(new { @class = "input-item" })
+                )
+
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OrganizationId, new { @class = "control-label" })
+
+                @(Html.Kendo().ComboBoxFor(model => model.OrganizationId)
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbOrganizations)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                )
+
+        </div>        
+
+
+            <div class="form-group">
+                <div class="align-right">
+                    <button id="rtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+                    <button id="rtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+                </div>
+            </div>
+
+
+    </div>
+}
+
+<script>
+    $("#rtCancel")
+        .click(function (e) {
+            $(this).closest(".k-window-content").data("kendoWindow").close();
+            return false;
+        });
+    $("#rtSave")
+        .click(function (e) {
+
+            var validator = $("#frmReferralOrder").kendoValidator().data("kendoValidator");
+            if (!validator.validate()) {
+                return false;
+            }
+
+            var item = new Object();
+            item.ReferralOrderId = '@Model.ReferralOrderId';
+            item.ReferralId = '@Model.ReferralId';
+            item.ConfirmOrderDate = $("#ConfirmOrderDate").val();
+            item.ReferralOrderDate = $("#ReferralOrderDate").val();
+            item.OrganizationId = $("#OrganizationId").val();
+            item.ReferralOrderStatusId = $("#ReferralOrderStatusId").val();
+
+            var rt = false;
+            var dt;
+            var q = $.ajax({
+                url: '@Url.Action("SaveReferralOrder", "ReferralOrder")',
+                dataType: "json",
+                type: "POST",
+                data: JSON.stringify({ referralOrderTemplate: item }),
+                contentType: "application/json; charset=utf-8",
+                async: false,
+                success: function (data) {
+                    dt = data;
+                    rt = true;
+                },
+                error: function (xhr) {
+                    dt = xhr;
+                    rt = false;
+                }
+            });
+            if (rt == true) {
+                if (dt.success != true) {
+                    alert(JSON.stringify(dt));
+                    return false;
+                }
+                else {
+                    if ('@Model.ReferralOrderId' == 0) {
+                        window.location.href = '@Url.Action("Index1", "ReferralOrder")';
+                    }
+                    else {
+                        $(this).closest(".k-window-content").data("kendoWindow").close();
+                    }
+                    return false;
+                }
+            }
+            else {
+                alert(dt);
+                return false;
+            }
+        });
+</script>
+
+

@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewBag.Title = "Դիմումին կցված փաստաթղթեր";
+}
+
+<div class="for-Toolbar">
+
+    @* Search Panel - Right Slide *@
+    <div class="">
+        <div class="">
+            @*<div class="slidePanel-btn">
+                </div>*@
+            <div class="create-item">
+                <h4>Որոնում</h4>
+                <div class="row">
+                    <div class="form-group col-md-3 margin-5-0">
+                        @(Html.Kendo().ComboBox()
+                    .Name("prmId")
+                    .Placeholder("Գործարկողներ")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbUsers)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                    </div>
+                    <div class="form-group col-md-3 margin-5-0">
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmStartDate")
+                                        .HtmlAttributes(new { placeholder = "Փոփոխման իրականացման ա/թ սկիզբ" })
+                        )
+                    </div>
+                    <div class="form-group col-md-3 margin-5-0">
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmEndDate")
+                                        .HtmlAttributes(new { placeholder = "Փոփոխման իրականացման ա/թ ավարտ" })
+                        )
+                    </div>
+                    <div class="form-group col-md-3 btns align-right">
+                        <button type="submit" id="rtSearch" class="k-button" onclick="return Search();"><i class="glyphicon glyphicon-search"></i> Որոնել</button>
+                        <button type="submit" class="k-button" onclick="return Clear();"><i class="glyphicon glyphicon-minus"></i> Մաքրել</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function Search() {
+        $("#InvocationDocumentLogItem").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function Clear() {
+        $("#prmId").data("kendoComboBox").select(-1);
+        $("#prmStartDate").val("");
+        $("#prmEndDate").val("");
+        $("#InvocationDocumentLogItem").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function getParameter() {
+        return {
+            userId: $("#prmId").val(),
+            startDate: $("#prmStartDate").val(),
+            endDate: $("#prmEndDate").val(),
+        };
+    }
+</script>
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.InvocationDocumentLogItem>()
+      .Name("InvocationDocumentLogItem")
+            .Columns(columns =>
+            {
+                columns.Bound(model => model.InvocationDocumentLogId).Width(125);
+                columns.Bound(model => model.DocumentTypeName).Width(125);
+                columns.Bound(model => model.DocumentURL).Width(125);
+                columns.Bound(model => model.DocumentGuid).Width(125);
+                columns.Bound(model => model.UserName).Width(125);
+                columns.Bound(model => model.LogDate).Width(125);
+
+            })
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Groupable()
+      .Scrollable()
+      .Sortable()
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadInvocationDocumentLogItems", "InvocationDocumentLogItem").Data("getParameter"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("LogDate").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.InvocationDocumentLogId);
+              model.Field(p => p.LogDate);
+          }
+          )
+)
+)
+

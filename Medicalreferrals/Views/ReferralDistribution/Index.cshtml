@@ -1,0 +1,256 @@
+﻿@model IEnumerable<Medicalreferrals.Models.ReferralDistributionItem>
+
+@{
+    ViewBag.Title = "Ուղեգրման քվոտաներ";
+}
+
+
+<script type="text/javascript">
+    $(document)
+        .ready(function () {
+            currentReferralDistributionIndex = -1;
+        });
+
+</script>
+
+@(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Նոր Գրառում").Id("btnInsert").Click("CreateReferralDistribution");
+        //items.Add().Type(CommandType.Button).Togglable(false).Text("Դիտել").Id("btnDetail").Click("ShowDetail");
+    })
+)
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralDistributionItem>()
+      .Name("ReferralDistribution")
+      .Events(events => events.DataBound("onReferralDistributionDataBound").DetailExpand("onReferralDistributionDetailExpand"))
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.ReferralDistributionId);
+          columns.Bound(model => model.StartDate);
+          columns.Bound(model => model.TerminationDate);
+          columns.Bound(model => model.IsClosed).Hidden();
+          columns.Bound(model => model.Id).Hidden();
+          columns.Command(commands =>
+          {
+              commands.Custom("cmdUpdateReferralDistribution").Text(" ").Click("UpdateReferralDistribution").HtmlAttributes(new { @class = "Update_Icon" });
+              commands.Custom("cmdDeleteReferralDistribution").Text(" ").Click("DeleteReferralDistribution").HtmlAttributes(new { @class = "Delete_Icon" });
+          }).Title("Հրահանգներ").Width(130);
+      })
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Scrollable()
+      .Sortable()
+      .HtmlAttributes(new { style = "height:620px;" })
+      .ClientDetailTemplateId("template")
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadReferralDistributionItems", "ReferralDistribution"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("ReferralDistributionId").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.ReferralDistributionId);
+          }
+          )
+)
+)
+
+@(Html.Kendo().Window().Name("wReferralDistribution")
+              .Width(350)
+              .Height(200)
+              .Draggable().Resizable()
+              .Content("").Modal(true).Actions(actions => actions.Pin().Close())
+              .Visible(false).Events(events => events
+              .Close("onCloseReferralDistribution")
+              .Open("onOpenReferralDistribution")
+              .Refresh("onRefreshReferralDistribution"))
+)
+
+<script>
+
+    function onReferralDistributionDataBound(e) {
+        showCommandIcons();
+        if (currentReferralDistributionIndex != -1) {
+            var row = $(this.tbody).find("tr.k-master-row:eq(" + currentReferralDistributionIndex + ")");
+            this.expandRow(row);
+        }
+    }
+
+    function onReferralDistributionDetailExpand(e) {
+        currentReferralDistributionIndex = $(e.masterRow).index(".k-master-row");
+        var selectedItem = this.dataItem(e.masterRow);
+        BID = selectedItem.ReferralDistributionId;
+        this.collapseRow(this.tbody.find(' > tr.k-master-row').not(e.masterRow));
+    }
+
+    function CreateReferralDistribution() {
+        var window = $("#wReferralDistribution").data("kendoWindow");
+        window.content("");
+        window.title("Նոր գրառում");
+        window.refresh({
+            url: "@Url.Action("Create", "ReferralDistribution")"
+        });
+        window.center();
+        window.open();
+        return false;
+    }
+
+    function UpdateReferralDistribution(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#ReferralDistribution").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        window.location.href = '@Url.Action("Update", "ReferralDistribution")/' + dataItem.ReferralDistributionId;
+        return false;
+    }
+
+    function DeleteReferralDistribution(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#ReferralDistribution").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var r = confirm("Ցանկանում էք հեռացնել գրառումը՞:");
+        if (r == false) {
+            return false;
+        }
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("Delete", "ReferralDistribution")',
+            dataType: "json",
+            type: "GET",
+            data: {
+                id: dataItem.ReferralDistributionId
+            },
+            async: false,
+            success: function (data) {
+                dt = data;
+                rt = true;
+            },
+            error: function (xhr) {
+                dt = xhr;
+                rt = false;
+            }
+        });
+        if (rt == true) {
+            if (dt.success != true) {
+                alert(JSON.stringify(dt));
+                return false;
+            }
+            else {
+                $("#ReferralDistribution").data("kendoGrid").dataSource.read();
+                return false;
+            }
+        }
+        else {
+            alert(dt);
+            return false;
+        }
+    }
+
+    function onOpenReferralDistribution(e) {
+        kendo.ui.progress(e.sender.element, true);
+    }
+    function onCloseReferralDistribution(e) {
+        $("#ReferralDistribution").data("kendoGrid").dataSource.read();
+        $(".k-overlay").css("display", "none");
+    }
+    function onRefreshReferralDistribution(e) {
+        kendo.ui.progress(e.sender.element, false);
+    }
+
+</script>
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+          .Name("tabStrip_#=ReferralDistributionId#")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Հիմնարկներ").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.ReferralDistributionOrganizationItem>()
+              .Name("Organization_#=ReferralDistributionId#")
+              .Events(e => e.DataBound("showCommandIcons"))
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.ReferralDistributionOrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationCode).Width(92);
+                  columns.Bound(model => model.OrganizationName).Width(284);
+                  columns.Bound(model => model.BudgetLineCode).Width(120);
+                  columns.Bound(model => model.BudgetLineName).Width(327);
+                  columns.Bound(model => model.ReferralDistributionCount).Width(150);
+                  columns.Bound(model => model.ChangeDate).Width(120);
+                  columns.Bound(model => model.ChangeBaseName).Width(157);
+              })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadReferralDistributionOrganizationItems", "ReferralDistribution", new { id = "#=ReferralDistributionId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.ReferralDistributionOrganizationId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .ClientDetailTemplateId("template2")
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+          })
+            .ToClientTemplate())
+</script>
+
+<script id="template2" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+          .Name("tabStrip_#=ReferralDistributionOrganizationId#")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Փոփոխություններ").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.ReferralDistributionOrganizationLogItem>()
+              .Name("Organization_#=ReferralDistributionOrganizationId#")
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.ReferralDistributionOrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationId).Hidden();
+                  columns.Bound(model => model.OrganizationCode).Width(92);
+                  columns.Bound(model => model.OrganizationName).Width(284);
+                  columns.Bound(model => model.BudgetLineCode).Width(120);
+                  columns.Bound(model => model.BudgetLineName).Width(327);
+                  columns.Bound(model => model.ReferralDistributionCount).Width(150);
+                  columns.Bound(model => model.ChangeDate).Width(120);
+                  columns.Bound(model => model.ChangeBaseName).Width(157);
+              })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadReferralDistributionOrganizationLogItems", "ReferralDistribution", new { id = "#=ReferralDistributionOrganizationId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.ReferralDistributionOrganizationLogId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+          })
+            .ToClientTemplate())
+</script>
+
+

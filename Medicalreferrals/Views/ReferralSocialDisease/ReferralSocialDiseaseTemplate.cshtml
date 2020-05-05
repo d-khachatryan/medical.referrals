@@ -1,0 +1,88 @@
+﻿@model Medicalreferrals.Models.ReferralSocialDisease
+
+
+@{
+    Layout = null;
+}
+
+<div class="container-full create-item">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.ReferralSocialDiseaseId)
+    @Html.HiddenFor(model => model.ReferralId)
+
+    <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SocialDiseaseId, new { @class = "control-label" })
+            @(Html.Kendo().ComboBoxFor(model => model.SocialDiseaseId)
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbSocialDiseases)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+            )
+            <br />
+            @Html.ValidationMessageFor(model => model.SocialDiseaseId, null, new { @class = "text-danger" })
+        </div>
+    </div>
+
+   
+    <div class="form-group margin-10-0 border-box">
+        <div class="col-xs-12 border-box align-right">
+            <button id="rsdtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+            <button id="rsdtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+        </div>
+    </div>
+    <div class="clear"></div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $("#rsdtCancel")
+            .click(function () {
+                if ($(this).closest(".k-window-content").data("kendoWindow"))
+                    $(this).closest(".k-window-content").data("kendoWindow").close();
+            });
+        $("#rsdtSave")
+            .click(function (e) {
+                var item = new Object();
+                item.ReferralSocialDiseaseId = '@Model.ReferralSocialDiseaseId';
+                item.ReferralId = '@Model.ReferralId';
+                item.SocialDiseaseId = $("#SocialDiseaseId").val();
+
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("SaveReferralSocialDisease", "ReferralSocialDisease")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ referralSocialDisease: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt != "1") {
+                        alert(JSON.stringify(dt));
+                    }
+                    else {
+                        if ($(this).closest(".k-window-content").data("kendoWindow"))
+                            $(this).closest(".k-window-content").data("kendoWindow").close();
+                    }
+                }
+                else {
+                    alert(dt);
+                    return false;
+                }
+            });
+    });
+</script>

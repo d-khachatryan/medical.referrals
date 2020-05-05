@@ -1,0 +1,103 @@
+﻿@model IEnumerable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>
+@using GridMvc.Html
+
+@section Styles {
+    @Styles.Render("~/Content/Gridmvc")
+}
+@{
+    ViewBag.Title ="nnn";
+}
+<h2>,,,</h2>
+
+<p>
+    <a href="@Url.Action("Create")" class="btn btn-success">
+        <i class="glyphicon glyphicon-plus"></i> ...
+    </a>
+</p>
+
+<div style="max-width: 450px;">
+    @Html.Grid(Model).Named("gridRoles").Columns(columns =>
+    {
+    //----Column of User Name
+    columns.Add(model => model.Name)
+        .Titled("")
+        .Sortable(true);
+
+    //----Column of Control Buttons
+    columns.Add()
+        .Titled("")
+        .Sanitized(false)
+        .Encoded(false)
+        .SetWidth(300)
+        .RenderValueAs(i => @<text>
+            <a type="button" href="@Url.Action("Index", new RouteValueDictionary {{"roleName", i.Name}, {"searchString", ViewBag.vbSearchString}, {"grid-column", ViewBag.valGridColumn}, {"grid-dir", ViewBag.valGridDir}, {"grid-page", ViewBag.valGridPage}, {"grid-filter", ViewBag.valGridFilter}})" class='btn btn-xs btn-success'><i class='glyphicon glyphicon-transfer'></i> ...</a>
+            <a type="button" href="@Url.Action("Edit", new RouteValueDictionary {{"roleName", i.Name}, {"searchString", ViewBag.vbSearchString}})" class='btn btn-xs btn-info'><i class='glyphicon glyphicon-pencil'></i> ...</a>
+            <a type="button" href="#@i.Id" class='btn btn-xs btn-danger' data-toggle="modal"><i class='glyphicon glyphicon-trash'></i> ...</a>
+
+            <!-- Modal HTML -->
+            <div id="@i.Id" class="modal fade" style="color:gray">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">...</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>... <b>@i.Name</b></p>
+                            <p class="text-warning"><small>...</small></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal"><i class='glyphicon glyphicon-log-out'></i> ...</button>
+                            <a type="button" href="@Url.Action("Delete", new RouteValueDictionary {{"roleName", i.Name}, {"userName", ViewBag.vbUserName}, {"searchString", ViewBag.vbSearchString}})" class='btn btn-danger'><i class='glyphicon glyphicon-trash'></i> .....</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </text>);
+}).WithPaging(10, 6).Sortable(true).Filterable(true).WithMultipleFilters()
+</div>
+
+@*<hr />
+    @using (Html.BeginForm())
+    {
+        <p>
+            Find by name: @Html.TextBox("SearchString")
+            <input type="submit" value="Search" />
+        </p>
+    }
+    <div>
+        <table class="table">
+            <tr>
+                <th>@Html.ActionLink("Name", "Index", new { searchString = ViewBag.vbSearchString, page = Model.PageNumber, sortOrder = String.IsNullOrEmpty(ViewBag.vbsortOrder) ? "name_desc" : "name" })</th>
+                <th>Commands</th>
+            </tr>
+            @foreach (var role in Model)
+            {
+                string selectedRow = "";
+                if (role.Name == ViewBag.vbRoleName)
+                {
+                    selectedRow = "success";
+                }
+                <tr class="@selectedRow">
+                    <td>
+                        @Html.DisplayFor(modelItem => role.Name)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Select", "Index", new { roleName = @role.Name, searchString = ViewBag.vbSearchString, page = Model.PageNumber, sortOrder = ViewBag.vbsortOrder })
+                        @Html.ActionLink("Edit", "Edit", new { roleName = @role.Name, searchString = ViewBag.vbSearchString, page = Model.PageNumber, sortOrder = ViewBag.vbsortOrder })
+                        <span onclick="return confirm('Are you sure to delete?')"><a href="~/Roles/Delete?roleName=@role.Name&amp;searchString=@ViewBag.vbSearchString&amp;page=@Model.PageNumber&amp;sortOrder=@ViewBag.vbsortOrder" class="delLink" style="color:red;">Delete</a></span>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+*@
+
+@section Scripts {
+    @Scripts.Render("~/bundles/Gridmvc")
+    <script>
+            $(function() {
+                pageGrids.gridRoles.lang = "....";
+            });
+    </script>
+}

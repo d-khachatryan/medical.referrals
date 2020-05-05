@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Կցվող փաստաթղթեր";
+}
+@(Html.Kendo().Grid<Medicalreferrals.Models.DocumentType>()
+              .Name("DocumentType")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.DocumentTypeId).Width(70);
+                  columns.Bound(product => product.DocumentTypeCode);
+                  columns.Bound(product => product.DocumentTypeName);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել").HtmlAttributes(new { @class = "Cat_Delete_Icon" });
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+                  toolbar.Save().SaveText("Հիշել").CancelText("Ընդհատել");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.DocumentTypeId);
+                        model.Field(product => product.DocumentTypeId).Editable(false);
+                    })
+                    .Create(create => create.Action("DocumentTypeCreate", "Catalog"))
+                    .Read(read => read.Action("DocumentTypeRead", "Catalog"))
+                    .Update(update => update.Action("DocumentTypeUpdate", "Catalog"))
+                    .Destroy(destroy => destroy.Action("DocumentTypeDestroy", "Catalog"))
+              )
+              .Pageable()
+              .HtmlAttributes(new { @class = "catalog-grid" })
+              .Scrollable()
+)
+

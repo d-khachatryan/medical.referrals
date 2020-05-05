@@ -1,0 +1,182 @@
+﻿@model Medicalreferrals.Models.ReferralOrderFinalize
+
+@{
+    ViewBag.Title = "Հերթագրման վավերացում";
+}
+
+<style>
+        .referralOrder table > tbody > tr > td:nth-child(1) {
+        text-align: right;
+        width: 40%;
+        }
+
+    .referralOrder table > tbody > tr > td:nth-child(1) > label,
+    .referralOrder table > tbody > tr > td:nth-child(1) {
+        font-weight: bold !important;
+        }
+    </style>
+
+<script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=hy'></script>
+
+@using (Html.BeginForm("ReferralOrderFinalize", "Home", FormMethod.Post, new { id = "mainarea", role = "form" }))
+{
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.ReferralId)
+    @Html.HiddenFor(model => model.ReferralNumber)
+    @Html.HiddenFor(model => model.ConfirmationDate)
+    @Html.HiddenFor(model => model.FirstName)
+    @Html.HiddenFor(model => model.LastName)
+    @Html.HiddenFor(model => model.PatronymicName)
+    @Html.HiddenFor(model => model.BirthDate)
+    @Html.HiddenFor(model => model.Identificator)
+
+    <div class="create-item container referralOrder">
+        <div style="width:600px; margin:0 auto">
+            <p>
+                Սույն պատուհանում ցուցադրվում են ուղեգրի և ուղեգրվողի վերաբերյալ տեղեկատվություն:
+                Անհրաժեշտ է միայն <b>Ընտրել հիմնարկը</b> դաշտում ընտրել այն բուժհաստատության անվանումը,
+                որտեղ ցանկանում եք հերթագրվել, իսկ <b>Ժամանակահատվածը</b> դաշտում նշել բժշկական կազմակերպություն
+                ընդունվելու Ձեզ համար ցանկալի ժամանակահատվածը:
+                (Այն չպետք է գերազանցի ուղեգրի վավերականության ժամկետը):
+            </p>
+
+            <div style="width:450px; margin:20px 0">
+
+                
+                <div class="form-group">
+                    @*@Html.LabelFor(model => model.OrganizationId)*@
+                    @(Html.Kendo().ComboBoxFor(model => model.OrganizationId)
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .Placeholder("- Ընտրել Հիմնարկը -")
+                                .Filter(FilterType.StartsWith)
+                                .BindTo(ViewBag.vbOrganizations)
+                                .HtmlAttributes(new { required = "required", validationmessage = "Դաշտը պարտադիր է:", data_value_primitive = true, @class = "input-item" })
+                    )
+                </div>
+                <div class="form-group">
+                    @*@Html.LabelFor(model => model.ReferralOrderDate)*@
+                    @Html.Kendo().DatePickerFor(model => model.ReferralOrderDate).Min(@Model.ConfirmationDate.ToString()).Max(@Model.ValidityDate.ToString()).HtmlAttributes(new { placeholder = "- Ամսաթիվ -" })
+                </div>
+
+                <h4>@Model.FirstName @Model.PatronymicName  @Model.LastName</h4>
+                <table class="table table-striped">
+                    <tr>
+                        <td>@Html.LabelFor(model => model.BirthDate)</td>
+                        <td>@Html.DisplayFor(model => model.BirthDate)</td>
+                    </tr>
+                    <tr>
+                        <td><label>Բնակության հասցե</label></td>
+                        <td>
+                            @if (!String.IsNullOrEmpty(Model.ResidentRegionName))
+                            {
+                                <span>մարզ @Html.DisplayFor(model => model.ResidentRegionName)<span>,</span></span>
+                            }
+                            @if (!String.IsNullOrEmpty(Model.ResidentCommunityName))
+                            {
+                                <span>համայնք @Html.DisplayFor(model => model.ResidentCommunityName)<span>,</span></span>
+                            }
+                            @if (!String.IsNullOrEmpty(Model.ResidentStreet))
+                            {
+                                <span>փողոց @Html.DisplayFor(model => model.ResidentStreet)<span>,</span></span>
+                            }
+                            @if (!String.IsNullOrEmpty(Model.ResidentHome))
+                            {
+                                <span>տուն @Html.DisplayFor(model => model.ResidentHome)<span>,</span></span>
+                            }
+                            @if (!String.IsNullOrEmpty(Model.ResidentRoom))
+                            {
+                                <span>բնակարան @Html.DisplayFor(model => model.ResidentRoom)<span>,</span></span>
+                            }
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>@Html.LabelFor(model => model.ResidentMail)</td>
+                        <td>@Html.DisplayFor(model => model.ResidentMail)</td>
+                    </tr>
+                    <tr>
+                        <td>@Html.LabelFor(model => model.Phone)</td>
+                        <td>@Html.DisplayFor(model => model.Phone)</td>
+                    </tr>
+                    <tr>
+                        <td><label>Ուղեգրման նպատակը</label></td>
+                        <td>
+                            @if (Model.ReferralPurpose1 == true)
+                            {
+                                <span>Ախտորոշման ճշտում հիվանդանոցային պայմաններում, </span>
+                            }
+                            @if (Model.ReferralPurpose2 == true)
+                            {
+                                <span>Բուժում հիվանդանոցային պայմաններում, </span>
+                            }
+                            @if (Model.ReferralPurpose3 == true)
+                            {
+                                <span>Հատուկ և դժվարամատչելի հետազոտություններ, </span>
+                            }
+                            @if (Model.ReferralPurpose4 == true)
+                            {
+                                <span>Առողջարանային բուժում, </span>
+                            }
+                            @if (Model.ReferralPurpose5 == true)
+                            {
+                                <span>Փորձաքննություն, </span>
+                            }
+                            @if (Model.ReferralPurpose6 == true)
+                            {
+                                <span>Օրթեզավորում/կորսետավորում, </span>
+                            }
+                            @if (Model.ReferralPurpose7 == true)
+                            {
+                                <span>Այլ</span>
+                            }
+                        </td>
+                    </tr>
+                    @*<tr>
+                <td>@Html.LabelFor(model => model.FirstName)</td>
+                <td>@Html.DisplayFor(model => model.FirstName)</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.LastName)</td>
+                <td>@Html.DisplayFor(model => model.LastName)</td>
+            </tr>
+            <tr>
+                <td>@Html.LabelFor(model => model.PatronymicName)</td>
+                <td>@Html.DisplayFor(model => model.PatronymicName)</td>
+            </tr>*@
+                    
+                    @*<tr>
+                        <td>@Html.LabelFor(model => model.Identificator)</td>
+                        <td>@Html.DisplayFor(model => model.Identificator)</td>
+                    </tr>*@
+                </table>
+
+                <p>
+                    Նշել «Ես ռոբոտ չեմ» նշիչը և սեղմել <b>Ուղարկել</b> կոճակը: 
+                </p>
+                <div class="margin-10-0">
+                    <div class="g-recaptcha" data-sitekey=@System.Configuration.ConfigurationManager.AppSettings["recaptchaPublicKey"]></div>
+                </div>
+
+                <input type="submit" class="btn btn-default" value="Ուղարկել" onclick="return checkData()" />
+                @if (Model.ReferralOrderStatusName != null)
+                {
+                    <p id="referralStatus" style="color:orangered; margin-top:5px"><i class="fa fa-exclamation-triangle"></i> @Model.ReferralOrderStatusName</p>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function checkData() {
+        var errTempl = '<div class="k-widget k-tooltip k-tooltip-validation" style="margin:0.5em"><span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div></div>';
+        var validator = $("#mainarea").kendoValidator({
+            errorTemplate: errTempl
+        }).data("kendoValidator");
+        if (!validator.validate()) {
+            return false;
+        }
+    }
+</script>
+

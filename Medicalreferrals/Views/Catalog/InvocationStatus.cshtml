@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Ուղեգրման դիմումի կարգավիճակ";
+}
+@(Html.Kendo().Grid<Medicalreferrals.Models.InvocationStatus>()
+              .Name("InvocationStatus")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.InvocationStatusId).Width(70);
+                  columns.Bound(product => product.InvocationStatusCode);
+                  columns.Bound(product => product.InvocationStatusName);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել").HtmlAttributes(new { @class = "Cat_Delete_Icon" });
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+                  toolbar.Save().SaveText("Հիշել").CancelText("Ընդհատել");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.InvocationStatusId);
+                        model.Field(product => product.InvocationStatusId).Editable(false);
+                    })
+                    .Create(create => create.Action("InvocationStatusCreate", "Catalog"))
+                    .Read(read => read.Action("InvocationStatusRead", "Catalog"))
+                    .Update(update => update.Action("InvocationStatusUpdate", "Catalog"))
+                    .Destroy(destroy => destroy.Action("InvocationStatusDestroy", "Catalog"))
+              )
+              .Pageable()
+              .HtmlAttributes(new { @class = "catalog-grid" })
+              .Scrollable()
+)
+

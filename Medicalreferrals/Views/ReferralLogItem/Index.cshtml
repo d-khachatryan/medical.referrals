@@ -1,0 +1,163 @@
+﻿
+@{
+    ViewBag.Title = "Ուղեգրում";
+}
+
+<div class="for-Toolbar">
+
+    @* Search Panel - Right Slide *@
+    <div class="">
+        <div class="">
+            @*<div class="slidePanel-btn">
+                </div>*@
+            <div class="create-item">
+                <h4>Որոնում</h4>
+                <div class="row">
+                    <div class="form-group col-md-3 margin-5-0">
+                        @(Html.Kendo().ComboBox()
+                    .Name("prmId")
+                    .Placeholder("Գործարկողներ")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbUsers)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                    </div>
+                    <div class="form-group col-md-3 margin-5-0">
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmStartDate")
+                                        .HtmlAttributes(new { placeholder = "Փոփոխման իրականացման ա/թ սկիզբ" })
+                        )
+                    </div>
+                    <div class="form-group col-md-3 margin-5-0">
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmEndDate")
+                                        .HtmlAttributes(new { placeholder = "Փոփոխման իրականացման ա/թ ավարտ" })
+                        )
+                    </div>
+                    <div class="form-group col-md-3 btns align-right">
+                        <button type="submit" id="rtSearch" class="k-button" onclick="return Search();"><i class="glyphicon glyphicon-search"></i> Որոնել</button>
+                        <button type="submit" class="k-button" onclick="return Clear();"><i class="glyphicon glyphicon-minus"></i> Մաքրել</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function Search() {
+        $("#ReferralLogItem").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function Clear() {
+        $("#prmId").data("kendoComboBox").select(-1);
+        $("#prmStartDate").val("");
+        $("#prmEndDate").val("");
+        $("#ReferralLogItem").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function getParameter() {
+        return {
+            userId: $("#prmId").val(),
+            startDate: $("#prmStartDate").val(),
+            endDate: $("#prmEndDate").val(),
+        };
+    }
+</script>
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralLogItem>()
+      .Name("ReferralLogItem")
+            .Columns(columns =>
+            {
+                columns.Bound(model => model.ReferralId).Width(125).Locked(true);
+                columns.Bound(model => model.FirstName).Width(125);
+                columns.Bound(model => model.LastName).Width(125);
+                columns.Bound(model => model.PatronymicName).Width(125);
+                columns.Bound(model => model.BirthDate).Width(125);
+                columns.Bound(model => model.IdentificatorTypeName).Width(125);
+                columns.Bound(model => model.Identificator).Width(125);
+                columns.Bound(model => model.Phone).Width(125);
+                columns.Bound(model => model.ResidentRegionName).Width(125);
+                columns.Bound(model => model.ResidentCommunityName).Width(125);
+                columns.Bound(model => model.ResidentStreet).Width(125);
+                columns.Bound(model => model.ResidentHome).Width(125);
+                columns.Bound(model => model.ResidentRoom).Width(125);
+                columns.Bound(model => model.HabitantRegionName).Width(125);
+                columns.Bound(model => model.HabitantCommunityName).Width(125);
+                columns.Bound(model => model.HabitantStreet).Width(125);
+                columns.Bound(model => model.HabitantHome).Width(125);
+                columns.Bound(model => model.HabitantRoom).Width(125);
+                columns.Bound(model => model.ReferralOrganizationName).Width(125);
+                columns.Bound(model => model.ReferralOrganizationCode).Width(125);
+                columns.Bound(model => model.ReferralOrganizationLocation).Width(125);
+                columns.Bound(model => model.ReferralOrganizationPhone).Width(125);
+                columns.Bound(model => model.PreliminaryDiagnose).Width(125);
+                columns.Bound(model => model.ReferralPurpose1).Width(125);
+                columns.Bound(model => model.ReferralPurpose2).Width(125);
+                columns.Bound(model => model.ReferralPurpose3).Width(125);
+                columns.Bound(model => model.ReferralPurpose3Description).Width(125);
+                columns.Bound(model => model.ReferralPurpose4).Width(125);
+                columns.Bound(model => model.ReferralPurpose5).Width(125);
+                columns.Bound(model => model.ReferralPurpose6).Width(125);
+                columns.Bound(model => model.ReferralPurpose7).Width(125);
+                columns.Bound(model => model.ReferralPurpose7Description).Width(125);
+                columns.Bound(model => model.SocialBenefit).Width(125);
+                columns.Bound(model => model.SocialBenefitDescription).Width(125);
+                columns.Bound(model => model.PhysicianName).Width(125);
+                columns.Bound(model => model.PhysicianCode).Width(125);
+                columns.Bound(model => model.ReferralDate).Width(125);
+                columns.Bound(model => model.HeadName).Width(125);
+                columns.Bound(model => model.ResidentMail).Width(125);
+                columns.Bound(model => model.Comment).Width(125);
+                columns.Bound(model => model.ReferralStatusName).Width(125);
+                columns.Bound(model => model.ConformationDate).Width(125);
+                columns.Bound(model => model.ConfirmationDate).Width(125);
+                columns.Bound(model => model.InvocationNumber).Width(125);
+                columns.Bound(model => model.DocumentURL).Width(125);
+                columns.Bound(model => model.DocumentGuid).Width(125);
+                columns.Bound(model => model.DiagnoseName).Width(125);
+                columns.Bound(model => model.OutcomeName).Width(125);
+                //columns.Bound(model => model.ReferralServiceDate).Width(125);
+                columns.Bound(model => model.OrganizationCode).Width(125);
+                columns.Bound(model => model.OrganizationName).Width(125);
+                columns.Bound(model => model.InitiationDate).Width(125);
+                columns.Bound(model => model.ReferralNumber).Width(125);
+                columns.Bound(model => model.ConformationUserId).Width(125);
+                columns.Bound(model => model.ConfirmationUserId).Width(125);
+                columns.Bound(model => model.ServiceUserId).Width(125);
+                columns.Bound(model => model.Id).Width(125);
+                columns.Bound(model => model.UserName).Width(125);
+                columns.Bound(model => model.ConformationUserName).Width(125);
+                columns.Bound(model => model.ConfirmationUserName).Width(125);
+                columns.Bound(model => model.ServiceUserName).Width(125);
+                columns.Bound(model => model.ValidityDate).Width(125);
+                columns.Bound(model => model.LogDate).Lockable(false).Width(125);
+
+            })
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Groupable()
+      .Scrollable()
+      .Sortable()
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadReferralLogItems", "ReferralLogItem").Data("getParameter"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("LogDate").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.ReferralId);
+              model.Field(p => p.LogDate);
+          }
+          )
+)
+)
+

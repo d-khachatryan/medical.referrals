@@ -1,0 +1,54 @@
+﻿@model Medicalreferrals.Models.ReferralOrderInput
+
+@{
+    ViewBag.Title = "Հերթագրման նպատակով դիմումի ներկայացում";
+}
+
+<script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=hy'></script>
+
+@using (Html.BeginForm("ReferralOrderInput", "Home", FormMethod.Post, new { id = "mainarea", role = "form" }))
+{
+    <div class="create-item container">
+        <div style="width:600px; margin:0 auto">
+            <h4>Հարգելի քաղաքացի</h4>
+            <p>
+                Հերթագրվելու նպատակով դիմում ներկայացնելու համար պետք է համապատասխան դաշտերում լրացնել Ուղեգրի համարը (երկու լատիներեն համապատասխան տառ և 6 թիվ, օրինակ ԲԱ000043) և ուղեգրի հաստատման ամսաթիվը: Նշել «Ես ռոբոտ չեմ» նշիչը և սեղմել Վավերացնել կոճակը:
+            </p>
+
+            <div style="width:302px; margin:20px 0">
+
+                <div class="form-group">
+                    @*@Html.LabelFor(model => model.ReferralNumber, new { @class = "control-label" })*@
+                    @Html.Kendo().TextBoxFor(model => model.ReferralNumber).HtmlAttributes(new { placeholder = "- Ուղեգրի համար -" })
+                </div>
+                <div class="form-group">
+                    @*@Html.LabelFor(model => model.ConfirmationDate, new { @class = "control-label" })*@
+                    @Html.Kendo().DatePickerFor(model => model.ConfirmationDate).HtmlAttributes(new { placeholder = "- Հաստատման ամսաթիվ -" })
+                </div>
+                <div class="margin-10-0">
+                    <div class="g-recaptcha" data-sitekey=@System.Configuration.ConfigurationManager.AppSettings["recaptchaPublicKey"]></div>
+                </div>
+
+                <input type="submit" class="btn btn-default" value="Վավերացնել" onclick="return checkData()" />
+                @if (Model.ReferralOrderStatusName != null)
+                {
+                    <p id="referralStatus" style="color:orangered; margin-top:5px"><i class="fa fa-exclamation-triangle"></i> @Model.ReferralOrderStatusName</p>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    function checkData() {
+        var errTempl = '<div class="k-widget k-tooltip k-tooltip-validation" style="margin:0.5em"><span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div></div>';
+        var validator = $("#mainarea").kendoValidator({
+            errorTemplate: errTempl
+        }).data("kendoValidator");
+        if (!validator.validate()) {
+            return false;
+        }
+    }
+</script>
+
+

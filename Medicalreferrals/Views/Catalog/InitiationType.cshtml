@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Ուղեգրման դիմումի տեսակներ";
+}
+@(Html.Kendo().Grid<Medicalreferrals.Models.InitiationType>()
+              .Name("InitiationType")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.InitiationTypeId).Width(70);
+                  columns.Bound(product => product.InitiationTypeCode);
+                  columns.Bound(product => product.InitiationTypeName);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել").HtmlAttributes(new { @class = "Cat_Delete_Icon" });
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+                  toolbar.Save().SaveText("Հիշել").CancelText("Ընդհատել");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.InitiationTypeId);
+                        model.Field(product => product.InitiationTypeId).Editable(false);
+                    })
+                    .Create(create => create.Action("InitiationTypeCreate", "Catalog"))
+                    .Read(read => read.Action("InitiationTypeRead", "Catalog"))
+                    .Update(update => update.Action("InitiationTypeUpdate", "Catalog"))
+                    .Destroy(destroy => destroy.Action("InitiationTypeDestroy", "Catalog"))
+              )
+              .Pageable()
+              .HtmlAttributes(new { @class = "catalog-grid" })
+              .Scrollable()
+)
+

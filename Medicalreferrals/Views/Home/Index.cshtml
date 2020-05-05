@@ -1,0 +1,154 @@
+﻿@model Medicalreferrals.Models.HomeIndexModel
+<script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=hy'></script>
+@{
+    ViewBag.Title = "Գլխավոր էջ";
+}
+<div class="homePage">
+    <div class="background-fon">
+        <div class="container">
+            <div class="row">
+                <div class="logo col-lg-6 col-md-9 col-sm-12">
+                    <div class="image col-lg-3 col-md-2 col-sm-3 col-xs-3">
+                    </div>
+                    <h2 class="col-lg-9 col-md-10 col-sm-9 col-xs-9">
+                        ՀԱՅԱՍՏԱՆԻ ՀԱՆՐԱՊԵՏՈՒԹՅԱՆ <br>
+                        ԱՌՈՂՋԱՊԱՀՈՒԹՅԱՆ ՀԱՄԱԿԱՐԳՈՒՄ <br>
+                        ՈՒՂԵԳՐՄԱՆ ԵՎ ՀԵՐԹԱԳՐՄԱՆ ՎԱՐՄԱՆ<br>
+                        ԷԼԵԿՏՐՈՆԱՅԻՆ ԿԱՌԱՎԱՐՄԱՆ <br>
+                        ՏԵՂԵԿԱՏՎԱԿԱՆ ՀԱՄԱԿԱՐԳ
+                    </h2>
+                </div>
+                <div class="clear"></div>
+                <div class="homePage-container">
+                    <div class="homePage-container-left col-lg-6 col-md-6 col-sm-12">
+                        <h1>Դիմել Ուղեգիր ստանալու նպատակով</h1>
+                        <h4>Հարգելի քաղաքացի</h4>
+                        <p class="homePage-container-text">
+                            Դուք հնարավորություն ունեք ուղեգիր ստանալու նպատակով, ուղեգող կազմակերպությանը առցանց ներկայացնել դիմում:
+                            Դիմումը կարող եք լրացնել <span>ձեռագիր</span> և <span>էլեկրոնային</span> տարբերակներով:
+                        </p>
+                        <fieldset class="create-fieldset">
+                            <legend>Ձեռագիր տարբերակ</legend>
+                            <p class="homePage-container-text">
+                                Ձեռագիր տարբերակով լրացնելու համար, անհրաժեշտ է ներբեռնել դիմումի <span><i class="fa fa-file-pdf-o" aria-hidden="true"></i> PDF</span>
+                                տարբերակը, տպել և լրացնել այն ձեռքով (ընթեռնելի): Ներբեռնելու համար սեղմել հղումը.
+                            </p>
+                            <div>
+                                <a href="@Url.Action("DownloadPreinvocationFile", "Home")" target="_blank"><i class="glyphicon glyphicon-download-alt"></i> Ներբեռնել դիմումի ձևաթերթը</a>
+                            </div>
+                            <p class="homePage-container-text">
+                                Լրացնելուց հետո, դիմումի թղթային տարբերակը
+                                դարձնել էլեկտրոնային ֆայլ (սկան) և ուղարկել: Դրա համար սեղմել հղումը.
+                            </p>
+                            <div>
+                                <a href="@Url.Action("PaperInvocation", "Home")" target="_blank"><i class="glyphicon glyphicon-open"></i> Բեռնել դիմումը</a>
+                            </div>
+                            <p class="homePage-container-text">
+                                Բացված պատուհանում ընտրել
+                                կազմակերպությունը` ում դիմում եք ուղեգիր ստանալու նպատակով, կցել դիմումը և այլ անհրաժեշտ փաստաթղթերի
+                                էլեկտրոնային պատճենները (սկան տարբերակ) և ուղարկել:
+                            </p>
+                        </fieldset>
+                        <fieldset class="create-fieldset">
+                            <legend>Էլեկրոնային տարբերակ</legend>
+                            <p class="homePage-container-text">
+                                Դիմումը էլեկտրոնային տարբերակով լրացնելու համար սեղմել հղումը.
+                            </p>
+                            <div>
+                                <a href="@Url.Action("DigitalInvocation", "Home")" target="_blank"><i class="glyphicon glyphicon-list-alt"></i> Լրացնել դիմումը առցանց</a>
+                            </div>
+                            <p class="homePage-container-text">
+                                Բացված
+                                պատուհանում լրացնել դաշտերը և կցել անհրաժեշտ փաստաթղթերի էլեկտրոնային պատճենները (սկան տարբերակ):
+                            </p>
+                        </fieldset>
+                    </div>
+
+
+
+
+
+
+                    <div class="homePage-container-right col-lg-6 col-md-6 col-sm-12">
+                        <h1>Դիմել Հերթագրման համար</h1>
+                        <h4>Հարգելի քաղաքացի</h4>
+                        <p class="homePage-container-text">
+                            Եթե Դուք արդեն դիմել եք և ստացել եք ուղեգիր, ապա Դուք կարող եք ներկայացնել դիմում` հերթագրման նպատակով: Դիմումը պետք է լրացվի էլեկրոնային տարբերակով:
+                        </p>
+                        <fieldset style="margin-bottom:40px;">
+                            <div>
+                                <a href="@Url.Action("ReferralOrderInput", "Home")" target="_blank"><i class="fa fa-medkit"></i> Հերթագրվել</a>
+                            </div>
+                        </fieldset>
+                        <fieldset class="create-fieldset">
+                            <legend>Հետևել ընթացքին</legend>
+                            <p class="homePage-container-text">
+                                Ձեր կողմից նշված էլէկտրոնային փոստի հասցեին կուղարկվի դիմումի, ուղեգրի կամ հերթագրամն համարը, որի միջոցով կստանաք տեղեկատվություն` դիմումի, ուղեգրման կամ հերթագրման ընթացքի վերաբերյալ:
+                            </p>
+
+                            @using (Html.BeginForm("Index", "Home", null, FormMethod.Post, new { id = "mainarea", @class = "form-horizontal", role = "form" }))
+                            {
+                                <div class="col-sm-12" style="margin-left:5px; width:305px">
+                                    @Html.DropDownListFor(model => model.RequestTypeId, new List<SelectListItem>
+                                        {
+                                            new SelectListItem{ Text="- Փաստաթղթի տեսակը -", Value = "0", Disabled=true },
+                                            new SelectListItem{ Text="Դիմում", Value = "1" },
+                                            new SelectListItem{ Text="Ուղեգրում", Value = "2", },
+                                            new SelectListItem{ Text="Հերթագրում", Value = "3" },
+                                         },/* "- Փաստաթղթի տեսակը -",*/ new { @class = "form-control", style = "margin-bottom:4px;" })
+                                    @Html.TextBoxFor(model => model.RequestId, new { placeholder = "փաստաթղթի համարը", @class = "form-control" })
+                                </div>
+                                <div class="clear"></div>
+                                <p id="requestStatus" style="margin:5px 0 0 8px; padding: 5px; background-color:#ce4844; color: #fff; display:inline-block;">@TempData["requestMessage"]</p>
+                                <div class="g-recaptcha" data-sitekey=@System.Configuration.ConfigurationManager.AppSettings["recaptchaPublicKey"]></div>
+                                <div class="clear"></div>
+                                <div class="col-sm-12">
+                                    <input type="submit" class="btn btn-default" value="Ստուգել" style="margin:10px 0 0 5px"/>
+                                </div>
+                                <div class="clear"></div>
+                            }
+
+                        </fieldset>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="background-fon">
+        <div class="container">
+            <div class="row">
+                <div class="homePage-container homePage-footer">
+                    <fieldset class="login-info">
+                        <p class="homePage-container-text">
+                            Սույն համակարգը մշակվել է «Առողջապահական և սոցիալական ծառայությունների արդյունավետության բարելավման շուրջ ԱՄՆ Կառավարության և ՀՀ կառավարության միջև ստորագրված AAG-111- G-10- 002 Համաձայնագրի շրջանակներում Հայաստանում տուբերկուլոզի դեմ պայքարի, մոր և մանկան առողջության, և ընտանիքի պլանավորման/վերարտադրողական առողջության բարելավման ծրագրով նախատեսված «Թափանցիկության և հաշվետվողականության բարելավում հանրային ծառայությունների տրամադրման համակարգում, ներառյալ ծառայությունների և ապրանքի գնումն ու բաշխումը» նպատակի իրականացման համար:
+                        </p>
+                    </fieldset>
+                    <div>
+                        <div class="float-left margin-0-10">
+                            <a href="https://www.usaid.gov/armenia" target="_blank"><img src="~/Img/usaid.jpg" height="70" /></a>
+                        </div>
+                        <div class="float-left margin-0-10">
+                            <a href="http://nih.am/" target="_blank"><img src="~/Img/nih.jpg" height="70" /></a>
+                        </div>
+                        <div class="float-left margin-0-10">
+                            <a href="http://moh.am/" target="_blank"><img src="~/Img/moh.jpg" height="70" /></a>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    <h5>
+                        &copy; Համակարգում ներառված տեղեկատվությունը հեղինակային է և կարող է չհամընկնել ԱՄՆ ՄԶԳ, ԱՄՆ Կառավարության տեսակետին  @DateTime.Now.Year
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(".image").height($(".image").next("h2").height());
+    $(document).ready(function () {
+        if ($("p#requestStatus").html().length == 0) {
+            $("p#requestStatus").hide();
+        }
+    });
+</script>

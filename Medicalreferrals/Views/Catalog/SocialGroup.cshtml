@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "Սոցկարգավիճակ";
+}
+@(Html.Kendo().Grid<Medicalreferrals.Models.SocialGroup>()
+              .Name("SocialGroup")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.SocialGroupId).Width(70);
+                  columns.Bound(product => product.SocialGroupCode);
+                  columns.Bound(product => product.SocialGroupName);
+                  columns.Command(commands =>
+                  {
+                      commands.Destroy().Text("Հեռացնել").HtmlAttributes(new { @class = "Cat_Delete_Icon" });
+                  }).Title("Հրահանգներ").Width(130);
+              })
+              .ToolBar(toolbar =>
+              {
+                  toolbar.Create().Text("Նոր");
+                  toolbar.Save().SaveText("Հիշել").CancelText("Ընդհատել");
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.SocialGroupId);
+                        model.Field(product => product.SocialGroupId).Editable(false);
+                    })
+                    .Create(create => create.Action("SocialGroupCreate", "Catalog"))
+                    .Read(read => read.Action("SocialGroupRead", "Catalog"))
+                    .Update(update => update.Action("SocialGroupUpdate", "Catalog"))
+                    .Destroy(destroy => destroy.Action("SocialGroupDestroy", "Catalog"))
+              )
+              .Pageable()
+              .HtmlAttributes(new { @class = "catalog-grid" })
+              .Scrollable()
+)
+

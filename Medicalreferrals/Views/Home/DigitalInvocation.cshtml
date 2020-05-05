@@ -1,0 +1,473 @@
+﻿@model Medicalreferrals.Models.HomeDigitalInvocationModel
+
+@{
+    ViewBag.Title = "Ուղեգիր ստանալու նպատակով  դիմումի էլեկտրոնային  տարբերակի ներկայացում";
+}
+
+@section Styles {
+    <style>
+        .k-widget.k-tooltip-validation {
+            margin-right: 15px;
+            font-size: 12px;
+            color: #787878;
+            position: relative;
+            z-index: 100;
+        }
+
+        .k-tooltip-validation:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        #organization .k-tooltip-validation:after,
+        #patient .k-tooltip-validation:after{
+            bottom: 100%;
+            left: 50%;
+            border-bottom: solid 8px #FFE44D;
+            border-left: solid 8px transparent;
+            border-right: solid 8px transparent;
+        }
+
+        #documents .k-tooltip-validation:after {
+            left: 100%;
+            top: 10%;
+            border-left: solid 8px #FFE44D;
+            border-bottom: solid 8px transparent;
+            border-top: solid 8px transparent;
+        }
+    </style>
+
+}
+
+<script type="text/javascript" src='https://www.google.com/recaptcha/api.js?hl=hy'></script>
+
+<div class="create-item">
+    @using (@Html.BeginForm("DigitalInvocation", "Home", new { folder = ViewBag.Folder, file1 = ViewBag.File1, file2 = ViewBag.File2, file3 = ViewBag.File3, file4 = ViewBag.File4 }, FormMethod.Post, new { id = "mainarea", role = "form" }))
+    {
+        @Html.ValidationSummary(false)
+        @Html.HiddenFor(model => model.InvocationId)
+
+        <div class="container">
+            <div class="row">
+
+                <ul id="InvocationTabs" class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#organization" aria-controls="organization" role="tab" data-toggle="tab">Ում դիմել</a></li>
+                    <li role="presentation"><a href="#patient" aria-controls="patient" role="tab" data-toggle="tab">Դիմող</a></li>
+                    <li role="presentation"><a href="#documents" aria-controls="documents" role="tab" data-toggle="tab">Կցվող փաստաթղթեր</a></li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+
+                    <!-- Organization -->
+                    <div role="tabpanel" class="tab-pane active" id="organization">
+                        <p style="padding:10px 15px;">
+                            Այստեղ պետք է ընտրել այն կազմակերպության անվանումը, որին դիմում եք ուղեգիր ստանալու նպատակով:
+                        </p>
+                        <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                            <div class="form-group">
+                                @*@Html.LabelFor(model => model.OrganizationId, new { @class = "control-label" })*@
+                                @(Html.Kendo().ComboBoxFor(model => model.OrganizationId)
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .Placeholder("Կազմակերպությունը (որին դիմում եք ուղեգիր ստանալու նպատակով)")
+                                .Filter(FilterType.StartsWith)
+                                .BindTo(ViewBag.vbOrganizations)
+                                //.HtmlAttributes(new { required = "required", validationmessage = "Դաշտը պարտադիր է:", data_value_primitive = true, @class = "input-item" })
+                                )
+                                @Html.ValidationMessageFor(model => model.OrganizationId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <hr />
+                        <p style="padding:10px 15px;">
+                            Այստեղ պետք է ընտրել, թե ինչ նպատակով եք ցանկանում ուղեգիր ստանալ, օրինակ՝ ախտորոշման ճշտում հիվանդանոցային պայմաններում, առողջարանային բուժում և այլն:
+                        </p>
+                        <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                            <div class="form-group">
+                                @*@Html.LabelFor(model => model.InvocationPurposeId, new { @class = "control-label" })*@
+                                @(Html.Kendo().ComboBoxFor(model => model.InvocationPurposeId)
+                                .DataTextField("Text")
+                                .Placeholder("Դիմումի նպատակը (ընտրել)")
+                                .DataValueField("Value")
+                                .Filter(FilterType.StartsWith)
+                                .BindTo(ViewBag.vbInvocationPurposes)
+                                //.HtmlAttributes(new { required = "required", validationmessage = "Դաշտը պարտադիր է:", data_value_primitive = true, @class = "input-item" })
+                                )
+                                @Html.ValidationMessageFor(model => model.InvocationPurposeId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="themeLine"></div>
+                        <div>
+                            <div class="col-sm-6 border-box align-left">
+
+                            </div>
+                            <div class="col-sm-6 border-box align-right">
+                                <a id="orgToPatient" class="k-button">Շարունակել</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!--End of Organization -->
+                    <!-- Patient -->
+                    <div role="tabpanel" class="tab-pane" id="patient">
+                        <p style="padding:10px 15px;">
+                            Այստեղ լրացվում է դիմումատուի անհատական տվյալները և ծննդյան տարեթիվը օր/ամիս/ տարի ձևաչափով, անպայման դրանք իրարից անջատելով «/» սիմվոլով. օրինակ 07/09/1955, կամ ընտրելով օրացույցից:
+                        </p>
+                        <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                            <div class="form-group">
+                                @(Html.Kendo().TextBoxFor(model => model.FirstName).HtmlAttributes(new { placeholder = "Անուն" })
+                                //.HtmlAttributes(new { type = "search", required = "required", validationmessage = "Դաշտը պարտադիր է:", @class = "input-item" })
+                                )
+                                @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                            <div class="form-group">
+                                @(Html.Kendo().TextBoxFor(model => model.LastName).HtmlAttributes(new { placeholder = "Ազգանուն" })
+                                //.HtmlAttributes(new { type = "search", required = "required", validationmessage = "Դաշտը պարտադիր է:", @class = "input-item" })
+                                )
+                                @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                            <div class="form-group">
+                                @Html.Kendo().TextBoxFor(model => model.PatronymicName).HtmlAttributes(new { placeholder = "Հայրանուն" })
+                                @Html.ValidationMessageFor(model => model.PatronymicName, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                            <div class="form-group">
+                                @(Html.Kendo().DatePickerFor(model => model.BirthDate)
+                             //.Format("dd/MM/yyyy")
+                             .HtmlAttributes(new { placeholder = "Ծննդյան տարեթիվ" })
+                                //.HtmlAttributes(new { required = "required", validationmessage = "Դաշտը պարտադիր է:", @class = "input-item" })
+                                )
+                                @Html.ValidationMessageFor(model => model.BirthDate, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+
+                        <h3 style="margin-bottom:10px;">Բնակության հասցե</h3>
+                        <p style="padding:10px 15px;">
+                            Այստեղ լրացվում է դիմումատուի փաստացի բնակության հասցեն:
+                        </p>
+                        <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                            <div class="form-group">
+                                @(Html.Kendo().ComboBoxFor(model => model.RegionId)
+                                .DataTextField("Text")
+                                .Placeholder("Մարզ")
+                                .DataValueField("Value")
+                                .Filter(FilterType.StartsWith)
+                                .BindTo(ViewBag.vbRegions)
+                                //.HtmlAttributes(new { required = "required", validationmessage = "Դաշտը պարտադիր է:", data_value_primitive = true, @class = "input-item" })
+                                )
+                                @Html.ValidationMessageFor(model => model.RegionId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                            <div class="form-group">
+                                @(Html.Kendo().ComboBoxFor(model => model.CommunityId)
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .Placeholder("Համայնք")
+                                .Filter(FilterType.StartsWith)
+                                .BindTo(ViewBag.vbCommunities)
+                                //.HtmlAttributes(new { required = "required", validationmessage = "Դաշտը պարտադիր է:", data_value_primitive = true, @class = "input-item" })
+                                )
+                                @Html.ValidationMessageFor(model => model.CommunityId, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-3 border-box">
+                            <div class="form-group">
+                                @Html.Kendo().TextBoxFor(model => model.Street).HtmlAttributes(new { placeholder = "Փողոց" })
+                                @Html.ValidationMessageFor(model => model.Street, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-lg-1 border-box">
+                            <div class="form-group">
+                                @Html.Kendo().TextBoxFor(model => model.Home).HtmlAttributes(new { placeholder = "Տուն" })
+                                @Html.ValidationMessageFor(model => model.Home, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-lg-2 border-box">
+                            <div class="form-group">
+                                @Html.Kendo().TextBoxFor(model => model.Room).HtmlAttributes(new { placeholder = "Բնակարան" })
+                                @Html.ValidationMessageFor(model => model.Room, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <hr />
+                        <p style="padding:10px 15px;">
+                            Այստեղ լրացվում է հեռախոսահամարը և էլեկտրոնային փոստի հասցեն, որին կուղարկվի դիմումի համարը:
+                            e-Referral.am կայքի միջոցով կկարողանաք հետևել Ձեր ներկայացրած դիմումի ընթացքին՝ մուտքագրելով ստացված դիմումի համարը:
+                        </p>
+                        <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                            <div class="form-group">
+                                <input type="text" class="k-textbox" placeholder="Հեռախոս (բջջային օպերատորի կամ տարածաշրջանի կոդ-համար)" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                            <div class="form-group">
+                                @Html.Kendo().TextBoxFor(model => model.ResidentMail).HtmlAttributes(new { placeholder = "էլեկտրոնային փոստի հասցե" })
+                                @Html.ValidationMessageFor(model => model.ResidentMail, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="themeLine"></div>
+                        <div>
+                            <div class="col-sm-6 border-box align-left">
+                                <a id="patientToOrg" class="k-button">Նախորդ</a>
+                            </div>
+                            <div class="col-sm-6 border-box align-right">
+                                <a id="patientToDocuments" class="k-button">Շարունակել</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /End of Patient -->
+                    <!-- Documents -->
+
+                    <script>
+                var validatable = $("form").kendoValidator({
+                    rules: {
+                        upload: function (input) {
+                            if (input[0].name == "indication") {
+                                return input.closest(".k-upload").find(".k-file").length;
+                            }
+                            if (input[0].name == "eligibility") {
+                                return input.closest(".k-upload").find(".k-file").length;
+                            }
+                            return true;
+                        }
+                    }
+                }).data("kendoValidator");
+                    </script>
+
+
+                    <div role="tabpanel" class="tab-pane" id="documents">
+
+                        <div class="col-sm-12 border-box margin-10-0">
+                            <div class="form-group">
+                                <div class="demo-section k-content">
+                                    <label class="control-label">
+                                        <span class="bold">Բժշկական ցուցումներ, նախկին բուժման տվյալներ. </span>
+                                        այստեղ պետք է կցել նախկին բուժման վերաբերյալ առկա փաստաթղթերի սկան տարբերակը:
+                                    </label>
+                                    @(Html.Kendo().Upload()
+                            .HtmlAttributes(new { validationmessage = "Ֆայլը կցված չէ" })
+                            .Name("indication")
+                            .Messages(m => m.Select("Կցել ֆայլ..."))
+                            .Multiple(true)
+                            .Async(a => a
+                            .Save("UploadFile1", "Home", new { name = ViewBag.File1, path = ViewBag.Folder })
+                            .Remove("DeleteFile", "Home", new { name = ViewBag.File1, path = ViewBag.Folder })
+                            .AutoUpload(true)
+                        )
+                        .Events(x => x.Select(@<text>
+                            function(e) {
+                            var files = e.files
+                            var acceptedFiles = [".jpg", ".jpeg", ".png", ".pdf"]
+                            var isAcceptedImageFormat = ($.inArray(files[0].extension, acceptedFiles)) != -1
+                            if (!isAcceptedImageFormat) {
+                            e.preventDefault();
+                            alert("Կցվող ֆայլը պետք է լինի jpeg, png կամ pdf ձևաչափով:");
+                            }
+                            }
+                        </text>))
+                                    )
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 border-box">
+                            <div class="form-group">
+                                <div class="demo-section k-content">
+                                    <label class="control-label">
+                                        <span class="bold">Սոցկարգարվիճակը հավաստող փաստաթղթեր. </span>
+                                        այստեղ պետք է կցել սոցիալական կարգավիճակին պատկանելությունը հավաստող, իրավասու մարմնի կողմից տրված փաստաթղթերի սկան տարբերակը:
+                                    </label>
+                                    @(Html.Kendo().Upload()
+                            .HtmlAttributes(new { validationmessage = "Ֆայլը կցված չէ" })
+                            .Name("eligibility")
+                            .Messages(m => m.Select("Կցել ֆայլ..."))
+                            .Multiple(true)
+                            .Async(a => a
+                            .Save("UploadFile2", "Home", new { name = ViewBag.File2, path = ViewBag.Folder })
+                            .Remove("DeleteFile", "Home", new { name = ViewBag.File2, path = ViewBag.Folder })
+                            .AutoUpload(true)
+                            )
+                            .Events(x => x.Select(@<text>
+                                function(e) {
+                                var files = e.files
+                                var acceptedFiles = [".jpg", ".jpeg", ".png", ".pdf"]
+                                var isAcceptedImageFormat = ($.inArray(files[0].extension, acceptedFiles)) != -1
+                                if (!isAcceptedImageFormat) {
+                                e.preventDefault();
+                                alert("Կցվող ֆայլը պետք է լինի jpeg, png կամ pdf ձևաչափով:");
+                                }
+                                }
+                            </text>))
+                                    )
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        <div class="col-sm-12 border-box">
+                            <div class="form-group">
+                                <div class="demo-section k-content">
+                                    <label class="control-label">
+                                        <span class="bold">Միջնորդագրեր, միջնորդություններ. </span>
+                                        այստեղ պետք է կցել հասարակական կազմակերպությունների, պետական գերատեսչությունների,  միություների (օրինակ՝ Ջավախահայերի միություն, Երկրապահների կամավորական միություն) միջնորդագրերի, միջնորդությունների փաստաթղթերի սկան տարբերակը:
+                                    </label>
+                                    @(Html.Kendo().Upload()
+                            .Name("petition")
+                            .Messages(m => m.Select("Կցել ֆայլ..."))
+                            .Multiple(true)
+                            .Async(a => a
+                            .Save("UploadFile3", "Home", new { name = ViewBag.File3, path = ViewBag.Folder })
+                            .Remove("DeleteFile", "Home", new { name = ViewBag.File3, path = ViewBag.Folder })
+                            .AutoUpload(true)
+                            )
+                            .Events(x => x.Select(@<text>
+                                function(e) {
+                                var files = e.files
+                                var acceptedFiles = [".jpg", ".jpeg", ".png", ".pdf"]
+                                var isAcceptedImageFormat = ($.inArray(files[0].extension, acceptedFiles)) != -1
+                                if (!isAcceptedImageFormat) {
+                                e.preventDefault();
+                                alert("Կցվող ֆայլը պետք է լինի jpeg, png կամ pdf ձևաչափով:");
+                                }
+                                }
+                            </text>))
+                                    )
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 border-box">
+                            <div class="form-group">
+                                <div class="demo-section k-content">
+                                    <label class="control-label">
+                                        <span class="bold">Այլ փաստաթղթեր. </span>
+                                        այստեղ պետք է կցել այն փաստաթղթերի սկան տարբերակը, որոնք կարող են նպաստել ուղեգիր ստանալուն:
+                                    </label>
+                                    @(Html.Kendo().Upload()
+                            .Name("other")
+                            .Messages(m => m.Select("Կցել ֆայլ..."))
+                            .Multiple(true)
+                            .Async(a => a
+                            .Save("UploadFile4", "Home", new { name = ViewBag.File4, path = ViewBag.Folder })
+                            .Remove("DeleteFile", "Home", new { name = ViewBag.File4, path = ViewBag.Folder })
+                            .AutoUpload(true)
+                        )
+                        .Events(x => x.Select(@<text>
+                            function(e) {
+                            var files = e.files
+                            var acceptedFiles = [".jpg", ".jpeg", ".png", ".pdf"]
+                            var isAcceptedImageFormat = ($.inArray(files[0].extension, acceptedFiles)) != -1
+                            if (!isAcceptedImageFormat) {
+                            e.preventDefault();
+                            alert("Կցվող ֆայլը պետք է լինի jpeg, png կամ pdf ձևաչափով:");
+                            }
+                            }
+                        </text>))
+                                    )
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+                        <div class="themeLine"></div>
+                        <div style="padding-left:15px;">
+                            <a id="documentsToPatient" class="k-button">Նախորդ</a>
+                        </div>
+
+                        <div class="col-sm-12 col-md-6 border-box margin-20-0">
+                            <div class="captchaCont">
+                                <p id="requestStatus">@TempData["requestMessage"]</p>
+                                <div class="g-recaptcha" data-sitekey=@System.Configuration.ConfigurationManager.AppSettings["recaptchaPublicKey"]></div>
+                                <input type="submit" class="btn btn-default" value="Ուղարկել" style="margin-top:10px" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-md-6 border-box align-left">
+                            <div id="callout-glyphicons-dont-mix" class="col-sm-12 border-box bs-callout bs-callout-danger">
+                                <h4>Ուշադրություն</h4>
+                                <p>
+                                    Դիմումը կարող է մերժվել, եթե ներկայացված տվյալները լինեն ոչ լիարժեք, իսկ կցված փաստաթղթերը՝ ոչ ամբողջական:
+                                </p>
+                            </div>
+                        </div>
+
+
+                        <div class="clear"></div>
+                    </div>
+                    <!-- End of Documents -->
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(".k-textbox").addClass("input-item")
+        var errTempl = '<div class="k-widget k-tooltip k-tooltip-validation" style="margin:0.5em"><span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div></div>';
+        $(function () {
+            $('#orgToPatient').click(function (e) {
+                e.preventDefault();
+                if ($("#organization").kendoValidator({
+                    errorTemplate: errTempl
+                }).data("kendoValidator").validate()) {
+                    $('#InvocationTabs a[href="#patient"]').tab('show');
+                }
+                else {
+                    return false;
+                }
+            })
+        })
+
+        $(function () {
+            $('#patientToOrg').click(function (e) {
+                e.preventDefault();
+                $('#InvocationTabs a[href="#organization"]').tab('show');
+            })
+        })
+
+        $(function () {
+            $('#patientToDocuments').click(function (e) {
+                e.preventDefault();
+                if ($("#patient").kendoValidator({
+                    errorTemplate: errTempl
+                }).data("kendoValidator").validate()) {
+                    $('#InvocationTabs a[href="#documents"]').tab('show');
+                }
+                else {
+                    return false;
+                }
+            })
+        })
+
+        $(function () {
+            $('#documentsToPatient').click(function (e) {
+                e.preventDefault();
+                $('#InvocationTabs a[href="#patient"]').tab('show');
+            })
+        })
+
+        $(function () {
+            var validator = $("#mainarea").kendoValidator({
+                errorTemplate: errTempl
+            }).data("kendoValidator");
+            $("form").submit(function (event) {
+                if (validator.validate()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        });
+
+    </script>
+}
+

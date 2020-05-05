@@ -1,0 +1,421 @@
+﻿
+@model IEnumerable<Medicalreferrals.Models.ReferralItem>
+
+@{
+    ViewBag.Title = "Ուղեգրի հաստատում";
+}
+
+
+<div class="for-Toolbar">
+    @(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Հաստատել").Id("btnConfirm").Click("ConfirmReferral");
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Վերադարձնել խմբագրման").Id("btnReturnUpdate").Click("ReturnUpdateReferral");
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Չեղարկել").Id("btnCancel").Click("CancelReferral");
+    })
+    )
+    @* Search Panel - Right Slide *@
+    <div class="right-slidePanel">
+        <div class="slidePanel-Content">
+            <div class="slidePanel-btn">
+            </div>
+            <div class="slidePanel-Content-fields create-item">
+                <h4>Ուղեգրի որոնում</h4>
+                <div class="form-group margin-5-0">
+                    <input id="prmReferralId" class="input-item k-textbox" placeholder="Ուղեգրի համար" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmFirstName" class="input-item k-textbox" placeholder="Անուն" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmLastName" class="input-item k-textbox" placeholder="Ազգանուն" />
+                </div>
+                <div class="form-group margin-5-0">
+                    @(Html.Kendo().DatePicker()
+                                        .Name("prmBirthDate")
+                                        .HtmlAttributes(new { placeholder = "Ծննդյան ա/թ" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmInvocationId" class="input-item k-textbox" placeholder="Դիմումի հերթական համար" />
+                </div>
+                <div class="form-group margin-5-0">
+                    @(Html.Kendo().ComboBox()
+                    .Name("prmReferralPurposeId")
+                    .Placeholder("Ուղեգրման նպատակ")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbReferralPurposes)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    @(Html.Kendo().ComboBox()
+                    .Placeholder("Ուղեգրման կարգավիճակ")
+                    .Name("prmReferralStatusId")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbReferralStatuses)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmUserName1" class="input-item k-textbox" placeholder="Նախապատրաստողի տվյալներ" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmUserName2" class="input-item k-textbox" placeholder="Համաձայնեցում տվողների տվյալներ" />
+                </div>
+                <div class="form-group btns align-right">
+                    <button type="submit" id="rtSearch" class="k-button" onclick="return Search();"><i class="glyphicon glyphicon-search"></i> Որոնել</button>
+                    <button type="submit" class="k-button" onclick="return Clear();"><i class="glyphicon glyphicon-minus"></i> Մաքրել</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document)
+        .ready(function () {
+            currentReferralIndex = -1;
+        });
+    function Search() {
+        $("#Referral").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function Clear() {
+        $("#prmReferralId").val("");
+        $("#prmFirstName").val("");
+        $("#prmLastName").val("");
+        $("#prmBirthDate").val("");
+        $("#prmInvocationId").val("");
+        $("#prmReferralPurposeId").data("kendoComboBox").select(-1);
+        $("#prmReferralStatusId").data("kendoComboBox").select(-1);
+        $("#prmUserName1").val("");
+        $("#prmUserName2").val("");
+        $("#Referral").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function getParameter() {
+        return {
+            referralId: $("#prmReferralId").val(),
+            firstName: $("#prmFirstName").val(),
+            lastName: $("#prmLastName").val(),
+            birthDate: $("#prmBirthDate").val(),
+            invocationId: $("#prmInvocationId").val(),
+            referralPurposeId: $("#prmReferralPurposeId").val(),
+            referralStatusId: $("#prmReferralStatusId").val(),
+            userName1: $("#prmUserName1").val(),
+            userName2: $("#prmUserName2").val(),
+        };
+    }
+</script>
+
+    @(Html.Kendo().Grid<Medicalreferrals.Models.ReferralItem>()
+      .Name("Referral")
+      .Events(events => events.DataBound("onReferralDataBound").DetailExpand("onReferralDetailExpand"))
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.ReferralNumber).Width(125);
+          columns.Bound(model => model.FirstName);
+          columns.Bound(model => model.LastName);
+          columns.Bound(model => model.PatronymicName);
+          columns.Bound(model => model.BirthDate);
+          columns.Bound(model => model.ReferralStatusName);
+          columns.Bound(model => model.UserName);
+          columns.Bound(model => model.ConformationUserName);
+      })
+
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Scrollable()
+      .Sortable()
+      .ClientDetailTemplateId("template")
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadReferrals3", "Referral").Data("getParameter"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("ReferralId").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.ReferralId);
+          }
+          )
+)
+    )
+
+    <script>
+        function ConfirmReferral() {
+            var grid = $("#Referral").data("kendoGrid");
+            var selectedItem = grid.dataItem(grid.select());
+            if (selectedItem == null) {
+                alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+                return false;
+            }
+            if (selectedItem.ReferralStatusId != 4) {
+                alert("Հաստատել կարելի է միայն այն ուղեգիրը, որն ունի «Ներկայացվել է հաստատման» կարգավիճակ:");
+            return false;
+               }
+            var rt = false;
+            var dt;
+            var q = $.ajax({
+                url: '@Url.Action("ConfirmReferral", "Referral")',
+                dataType: "json",
+                type: "GET",
+                data: { id: selectedItem.ReferralId },
+                async: false,
+                success: function (data) { dt = data; rt = true; },
+                error: function (xhr) { dt = xhr; rt = false; }
+            });
+            if (rt == true) {
+                if (dt.statuscode == 1) {
+                    $("#Referral").data("kendoGrid").dataSource.read();
+                    alert(dt.message);
+                }
+                else {
+                    alert(dt.message);
+                }
+            }
+            else {
+                alert("Չբացահայտված տեխնիկական սխալ:");
+            }
+            return false;
+        }
+
+        function ReturnUpdateReferral() {
+            var grid = $("#Referral").data("kendoGrid");
+            var selectedItem = grid.dataItem(grid.select());
+            if (selectedItem == null) {
+                alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+                return false;
+            }
+            if (selectedItem.ReferralStatusId != 4) {
+                alert("Վերադարձնել խմբագրման կարելի է միայն այն դիմումը, որն ունի «Ներկայացվել է հաստատման» կարգավիճակ:");
+            return false;
+               }
+            var rt = false;
+            var dt;
+            var q = $.ajax({
+                url: '@Url.Action("ReturnUpdateReferral", "Referral")',
+                dataType: "json",
+                type: "GET",
+                data: { id: selectedItem.ReferralId },
+                async: false,
+                success: function (data) { dt = data; rt = true; },
+                error: function (xhr) { dt = xhr; rt = false; }
+            });
+            if (rt == true) {
+                if (dt.statuscode == 1) {
+                    $("#Referral").data("kendoGrid").dataSource.read();
+                    alert(dt.message);
+                }
+                else {
+                    alert(dt.message);
+                }
+            }
+            else {
+                alert("Չբացահայտված տեխնիկական սխալ:");
+            }
+            return false;
+        }
+
+        function CancelReferral() {
+            var grid = $("#Referral").data("kendoGrid");
+            var selectedItem = grid.dataItem(grid.select());
+            if (selectedItem == null) {
+                alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+                return false;
+            }
+            if (selectedItem.ReferralStatusId != 4) {
+                alert("Չեղարկել կարելի է միայն այն ուղեգիրը, որն ունի «Ներկայացվել է հաստատման» կարգավիճակ:");
+            return false;
+               }
+            var rt = false;
+            var dt;
+            var q = $.ajax({
+                url: '@Url.Action("CancelReferral", "Referral")',
+                dataType: "json",
+                type: "GET",
+                data: { id: selectedItem.ReferralId },
+                async: false,
+                success: function (data) { dt = data; rt = true; },
+                error: function (xhr) { dt = xhr; rt = false; }
+            });
+            if (rt == true) {
+                if (dt.statuscode == 1) {
+                    $("#Referral").data("kendoGrid").dataSource.read();
+                    alert(dt.message);
+                }
+                else {
+                    alert(dt.message);
+                }
+            }
+            else {
+                alert("Չբացահայտված տեխնիկական սխալ:");
+            }
+            return false;
+        }
+
+        function onReferralDataBound(e) {
+            $(".Update_Icon").find("span").addClass("glyphicon glyphicon-pencil");
+            $(".Delete_Icon").find("span").addClass("glyphicon glyphicon-trash");
+            if (currentReferralIndex != -1) {
+                var row = $(this.tbody).find("tr.k-master-row:eq(" + currentReferralIndex + ")");
+                this.expandRow(row);
+            }
+        }
+
+        function onReferralDetailExpand(e) {
+            currentReferralIndex = $(e.masterRow).index(".k-master-row");
+            var selectedItem = this.dataItem(e.masterRow);
+            RID = selectedItem.ReferralId;
+            this.collapseRow(this.tbody.find(' > tr.k-master-row').not(e.masterRow));
+        }
+
+    </script>
+
+    <script id="template" type="text/kendo-tmpl">
+        @(Html.Kendo().TabStrip()
+          .Name("tabStrip_#=ReferralId#")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Սոցիալական խմբեր").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.ReferralSocialGroupItem>()
+              .Name("SocialGroup_#=ReferralId#")
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.ReferralSocialGroupId).Hidden();
+                  columns.Bound(model => model.ReferralId).Hidden();
+                  columns.Bound(model => model.SocialGroupId).Hidden();
+                  columns.Bound(model => model.SocialGroupName);
+                  columns.Bound(model => model.SocialGroupNumber).Width(250).HtmlAttributes(new { @style = "text-align: center" });
+              })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadReferralSocialGroups", "ReferralSocialGroup", new { id = "#=ReferralId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.ReferralSocialGroupId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+
+        )
+        </text>);
+          items.Add().Text("Սոցիալական հիվանդություններ").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.ReferralSocialDiseaseItem>()
+              .Name("SocialDisease_#=ReferralId#")
+              .Columns(columns =>
+                  {
+                      columns.Bound(model => model.ReferralSocialDiseaseId).Hidden();
+                      columns.Bound(model => model.ReferralId).Hidden();
+                      columns.Bound(model => model.SocialDiseaseName);
+                  })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadReferralSocialDiseases", "ReferralSocialDisease", new { id = "#=ReferralId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.ReferralSocialDiseaseId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+          items.Add().Text("Կից փաստաթղթեր").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.ReferralDocumentItem>()
+              .Name("Document_#=ReferralId#")
+              .Events(e => e.DataBound("showCommandIcons"))
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.ReferralDocumentId).Hidden();
+                  columns.Bound(model => model.ReferralId).Hidden();
+                  columns.Bound(model => model.DocumentTypeName);
+                  columns.Bound(model => model.DocumentURL).ClientTemplate(@Html.ActionLink(" ", "DownloadFile", "ReferralDocument", new { relativeFilePath = "\\#= DocumentURL\\#" }, new { target = "_blank" }).ToHtmlString()).HtmlAttributes(new { @class = "Show_Icon", style = "text-align:center" }).Width(120);
+              })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadReferralDocuments", "ReferralDocument", new { id = "#=ReferralId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.ReferralDocumentId);
+                          model.Field(p => p.DocumentURL);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+
+
+
+
+          items.Add().Text("Հերթագրումներ").Content(@<text>
+            @(Html.Kendo().Grid<Medicalreferrals.Models.ReferralOrderItem>()
+              .Name("Order_#=ReferralId#")
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.ReferralOrderId);
+                  columns.Bound(model => model.ReferralId).Hidden();
+                  columns.Bound(model => model.ReferralNumber);
+                  columns.Bound(model => model.FirstName);
+                  columns.Bound(model => model.LastName);
+                  columns.Bound(model => model.PatronymicName);
+                  columns.Bound(model => model.BirthDate).Width(115);
+                  columns.Bound(model => model.ReferralOrderDate).Width(142);
+                  columns.Bound(model => model.ServiceDate).Hidden();
+              })
+                                   .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadReferralOrders", "Referral", new { id = "#=ReferralId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.ReferralOrderId);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+            )
+        </text>);
+
+          })
+            .ToClientTemplate())
+    </script>
+
+

@@ -1,0 +1,309 @@
+﻿@model Medicalreferrals.Models.Organization
+
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveOrganization", "Organization", FormMethod.Post, new { id = "frmOrganization" }))
+{
+    <div class="create-item">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="container maxWidth900">
+            <div class="row">
+                <div class="col-sm-12 col-md-4 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrganizationId, new { @class = "control-label" })
+                        @Html.Kendo().IntegerTextBoxFor(model => model.OrganizationId).Format("#")
+                        @Html.ValidationMessageFor(model => model.OrganizationId)
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrganizationCode, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.OrganizationCode)
+                        @Html.ValidationMessageFor(model => model.OrganizationCode)
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.RegionId, new { @class = "control-label" })
+                        @(Html.Kendo().ComboBoxFor(model => model.RegionId)
+                            .DataTextField("Text")
+                            .Placeholder("- Ընտրել -")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbRegions)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                        @Html.ValidationMessageFor(model => model.RegionId)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrganizationName, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.OrganizationName)
+                        @Html.ValidationMessageFor(model => model.OrganizationName)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 col-md-4 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.TinNumber, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.TinNumber)
+                        @Html.ValidationMessageFor(model => model.TinNumber)
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BankName, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.BankName)
+                        @Html.ValidationMessageFor(model => model.BankName)
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-4 col-lg-4 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BankAccountNumber, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.BankAccountNumber)
+                        @Html.ValidationMessageFor(model => model.BankAccountNumber)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrganizationLocation, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.OrganizationLocation)
+                        @Html.ValidationMessageFor(model => model.OrganizationLocation)
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.HeadName, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.HeadName)
+                        @Html.ValidationMessageFor(model => model.HeadName)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Phone, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.Phone)
+                        @Html.ValidationMessageFor(model => model.Phone)
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Mail, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.Mail)
+                        @Html.ValidationMessageFor(model => model.Mail)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ReferralNumberTemlate, new { @class = "control-label" })
+                        @Html.Kendo().TextBoxFor(model => model.ReferralNumberTemlate)
+                        @Html.ValidationMessageFor(model => model.ReferralNumberTemlate)
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.OrganizationTypeId, new { @class = "control-label" })
+                        @(Html.Kendo().ComboBoxFor(model => model.OrganizationTypeId)
+                                .DataTextField("Text")
+                                .DataValueField("Value")
+                                .Placeholder("- Ընտրել -")
+                                .Filter(FilterType.StartsWith)
+                                .BindTo(ViewBag.vbOrganizationTypes)
+                                .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                        )
+                        @Html.ValidationMessageFor(model => model.OrganizationTypeId)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.Kendo().CheckBoxFor(model => model.IsInvocationOrganization)
+                        @Html.ValidationMessageFor(model => model.IsInvocationOrganization)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 col-md-6 col-lg-6 border-box">
+                    <div class="form-group">
+                        @Html.Kendo().CheckBoxFor(model => model.IsReferralOrganization)
+                        @Html.ValidationMessageFor(model => model.IsReferralOrganization)
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="col-sm-12 border-box margin-5-0">
+                    @Html.LabelFor(model => model.OrganizationBudgetLines, new { @class = "control-label" })
+                    @(Html.Kendo().Grid<Medicalreferrals.Models.OrganizationBudgetLine>()
+                       .Name("OrganizationBudgetLine")
+                       .Columns(columns =>
+                       {
+                           columns.Bound(model => model.OrganizationBudgetLineId).Hidden();
+                           columns.Bound(model => model.OrganizationId).Hidden();
+                           columns.ForeignKey(model => model.BudgetLineId, (List<SelectListItem>)ViewBag.vbBudgetLines, "Value", "Text").EditorTemplateName("BudgetLine");
+                           columns.Bound(model => model.IsOrderable).HtmlAttributes(new { style = "text-align: center" })
+                           .ClientTemplate("#if(IsOrderable){#" +
+                                               "<i class=\"fa fa-check-square-o\"></i>" +
+                                               "#} else {#" +
+                                               "<i class=\"fa fa-square-o\"></i>" +
+                                               "# } #")
+                           .Width(130);
+                           columns.Bound(model => model.IsReferrable).HtmlAttributes(new { style = "text-align: center" })
+                           .ClientTemplate("#if(IsReferrable){#" +
+                                               "<i class=\"fa fa-check-square-o\"></i>" +
+                                               "#} else {#" +
+                                               "<i class=\"fa fa-square-o\"></i>" +
+                                               "# } #").Width(130);
+                           columns.Command(commands =>
+                           {
+                               commands.Destroy().Text("Հեռացնել");
+                           }).Title(" ").Width(130);
+                       })
+                           .ToolBar(toolbar =>
+                           {
+                               toolbar.Create().Text("Նոր");
+                           })
+                           .Editable(editable => editable.Mode(GridEditMode.InCell))
+                           .DataSource(dataSource => dataSource
+                               .Ajax()
+                               .Batch(true)
+                               .Read(read => read.Action("ReadOrganizationBudgetLines", "Organization", new { id = @Model.OrganizationId }))
+                           .Model(model =>
+                           {
+                               model.Id(p => p.OrganizationId);
+                           }
+                           )
+                           )
+                            .Scrollable()
+                            .Resizable(resize => resize.Columns(true))
+                            .Reorderable(reorder => reorder.Columns(true))
+                            .Sortable()
+                    )
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                    <div class="form-group align-right">
+                        <button id="rsdtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+                        <button id="rsdtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        $(".k-textbox").addClass("input-item");
+
+        $("#rsdtCancel")
+            .click(function () {
+                $(this).closest(".k-window-content").data("kendoWindow").close();
+                return false;
+            });
+        $("#rsdtSave")
+            .click(function (e) {
+
+                var validator = $("#frmOrganization").kendoValidator().data("kendoValidator");
+
+                var RegionId = $("#RegionId").data("kendoComboBox").input;
+                var OrganizationTypeId = $("#OrganizationTypeId").data("kendoComboBox").input;
+                if (!validator.validate()) {
+                    RegionId.addClass("k-invalid");
+                    OrganizationTypeId.addClass("k-invalid");
+                    return false;
+                }
+                RegionId.removeClass("k-invalid");
+                OrganizationTypeId.removeClass("k-invalid");
+
+                var item = new Object();
+                item.OrganizationId = $("#OrganizationId").val();
+                item.OrganizationCode = $("#OrganizationCode").val();
+                item.OrganizationName = $("#OrganizationName").val();
+                item.RegionId = $("#RegionId").val();
+                item.TinNumber = $("#TinNumber").val();
+                item.BankName = $("#BankName").val();
+                item.BankAccountNumber = $("#BankAccountNumber").val();
+                item.OrganizationLocation = $("#OrganizationLocation").val();
+                item.HeadName = $("#HeadName").val();
+                item.Phone = $("#Phone").val();
+                item.Mail = $("#Mail").val();
+                item.IsInvocationOrganization = $("#IsInvocationOrganization").prop('checked');
+                item.IsReferralOrganization = $("#IsReferralOrganization").prop('checked');
+                item.ReferralNumberTemlate = $("#ReferralNumberTemlate").val();
+                item.OrganizationTypeId = $("#OrganizationTypeId").val();
+
+                debugger;
+                var OrganizationBudgetLineGrid = $("#OrganizationBudgetLine").data("kendoGrid"), parameterMap = OrganizationBudgetLineGrid.dataSource.transport.parameterMap;
+                var currentOrganizationBudgetLineData = OrganizationBudgetLineGrid.dataSource.data();
+                var rItems = [];
+                for (var i = 0; i < currentOrganizationBudgetLineData.length; i++) {
+                    var itm = new Object();
+                    if (currentOrganizationBudgetLineData[i].isNew()) {
+                        itm.OrganizationBudgetLineId = currentOrganizationBudgetLineData[i].OrganizationBudgetLineId;
+                        itm.OrganizationId = currentOrganizationBudgetLineData[i].OrganizationId;
+                        itm.BudgetLineId = currentOrganizationBudgetLineData[i].BudgetLineId;
+                        itm.IsOrderable = currentOrganizationBudgetLineData[i].IsOrderable;
+                        itm.IsReferrable = currentOrganizationBudgetLineData[i].IsReferrable;
+                        itm.RecordStatus = String(1);
+                        rItems.push(itm);
+                    } else if (currentOrganizationBudgetLineData[i].dirty) {
+                        itm.OrganizationBudgetLineId = currentOrganizationBudgetLineData[i].OrganizationBudgetLineId;
+                        itm.OrganizationId = currentOrganizationBudgetLineData[i].OrganizationId;
+                        itm.BudgetLineId = currentOrganizationBudgetLineData[i].BudgetLineId;
+                        itm.IsOrderable = currentOrganizationBudgetLineData[i].IsOrderable;
+                        itm.IsReferrable = currentOrganizationBudgetLineData[i].IsReferrable;
+                        itm.RecordStatus = String(2);
+                        rItems.push(itm);
+                    }
+                }
+                for (var i = 0; i < OrganizationBudgetLineGrid.dataSource._destroyed.length; i++) {
+                    var itm = new Object();
+                    itm.OrganizationBudgetLineId = OrganizationBudgetLineGrid.dataSource._destroyed[i].OrganizationBudgetLineId;
+                    itm.OrganizationId = OrganizationBudgetLineGrid.dataSource._destroyed[i].OrganizationId;
+                    itm.BudgetLineId = OrganizationBudgetLineGrid.dataSource._destroyed[i].BudgetLineId;
+                    itm.IsOrderable = OrganizationBudgetLineGrid.dataSource._destroyed[i].IsOrderable;
+                    itm.IsReferrable = OrganizationBudgetLineGrid.dataSource._destroyed[i].IsReferrable;
+                    itm.RecordStatus = String(3);
+                    rItems.push(itm);
+                }
+                item.OrganizationBudgetLines = rItems;
+                //console.log(item)
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("SaveOrganization", "Organization")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ organization: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt.success != true) {
+                        alert(JSON.stringify(dt.responseText));
+                        return false;
+                    }
+                    else {
+                        $(this).closest(".k-window-content").data("kendoWindow").close();
+                        //alert(JSON.stringify(dt.responseText));
+                        return false;
+                    }
+                }
+                else {
+                    alert(JSON.stringify("Unknown error occured."));
+                    return false;
+                }
+            });
+    });
+</script>

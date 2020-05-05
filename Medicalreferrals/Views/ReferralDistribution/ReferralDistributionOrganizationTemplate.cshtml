@@ -1,0 +1,81 @@
+﻿@model Medicalreferrals.Models.ReferralDistribution
+
+@*<script src="http://kendo.cdn.telerik.com/2016.2.714/js/cultures/kendo.culture.en-GB.min.js"></script>
+
+<script type="text/javascript">
+     //set current to the "en-GB" culture script
+     kendo.culture("en-GB");
+</script>*@
+
+
+@{
+    ViewBag.Title = "Քվոտաների կառավարում";
+}
+
+<div>
+    <div>
+        <div class="float-left" style="width:70px">
+            @Html.DisplayNameFor(model => model.StartDate)
+        </div>
+        <div class="float-left">
+            @Html.DisplayFor(model => model.StartDate)
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div>
+        <div class="float-left" style="width:70px">
+            @Html.DisplayNameFor(model => model.TerminationDate)
+        </div>
+        <div class="float-left">
+            @Html.DisplayFor(model => model.TerminationDate)
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.ReferralDistributionOrganization>()
+              .Name("ReferralDistributionOrganization")
+              .Columns(columns =>
+              {
+                  columns.Bound(product => product.ReferralDistributionOrganizationId).Hidden();
+                  columns.Bound(product => product.ReferralDistributionId).Hidden();
+                  columns.ForeignKey(p => p.OrganizationId, (List<SelectListItem>)ViewBag.vbOrganizationCodes, "Value", "Text").Sortable(true).Width(92);
+                  columns.ForeignKey(p => p.OrganizationId, (List<SelectListItem>)ViewBag.vbOrganizations, "Value", "Text").Title("Հիմնարկ").Sortable(false).Width(280);
+                  columns.ForeignKey(p => p.BudgetLineId, (List<SelectListItem>)ViewBag.vbBudgetLineCodes, "Value", "Text").Sortable(true).Width(135);
+                  columns.ForeignKey(p => p.BudgetLineId, (List<SelectListItem>)ViewBag.vbBudgetLines, "Value", "Text").Title("ՊՊ խմբի անվանում").Sortable(false).Width(327);
+                  columns.Bound(product => product.ReferralDistributionCount).Sortable(false).Width(175);
+                  columns.Bound(product => product.ChangeDate).Width(120);
+                  columns.ForeignKey(model => model.ChangeBaseId, (List<SelectListItem>)ViewBag.vbChangeBases, "Value", "Text").EditorTemplateName("ChangeBase").Width(175);
+              })
+              .ToolBar(toolbar =>
+              {
+              toolbar.Template(@<text>
+        @item.SaveButton(cancelText: "Չեղարկել", saveText: "Հիշել")
+        <a href="@Url.Action("Index", "ReferralDistribution")" class="k-button"><i class="fa fa-arrow-circle-o-left"></i> Վերադառնալ հիմնական պատուհանին</a>
+            </text>);
+              })
+              .Editable(editable => editable.Mode(GridEditMode.InCell))
+              .Groupable()
+              .Filterable()
+              .DataSource(dataSource =>
+                  dataSource.Ajax()
+                    .Batch(true)
+                    .Model(model =>
+                    {
+                        model.Id(product => product.ReferralDistributionOrganizationId);
+                        model.Field(product => product.ReferralDistributionOrganizationId).Editable(false);
+                        model.Field(product => product.ReferralDistributionId).Editable(false);
+                        model.Field(product => product.OrganizationId).Editable(false);
+                    })
+                    //.Create(create => create.Action("CameraCreate", "Catalog"))
+                    .Read(read => read.Action("ReadReferralDistributionOrganizations", "ReferralDistribution", new { id = @Model.ReferralDistributionId }))
+                    .Update(update => update.Action("UpdateReferralDistributionOrganization", "ReferralDistribution"))
+              //.Destroy(destroy => destroy.Action("CameraDestroy", "Catalog"))
+              )
+              .Sortable()
+              .HtmlAttributes(new { @class = "catalog-grid" })
+              .Scrollable()
+)
+
+
+

@@ -1,0 +1,192 @@
+﻿@model Medicalreferrals.Models.InvocationItem
+
+@{
+    ViewBag.Title = Model.FirstName + " " + Model.LastName;
+}
+
+<div id="content" style="margin:0 auto; padding:10px 20px; font-size:12px; width:595px;">
+    @*<h3>Դիմումի ծանուցագիր</h3>*@
+    <h3>Հարգելի քաղաքացի</h3>
+    <p>
+        Դուք ուղեգիր ստանալու նպատակով դիմում եք ներկայացրել ՀՀ առողջապահության նախարարություն, մարզպետարան, բուժհիմնարկ, այսինքն՝ հանձնել եք այն առձեռն կամ ուղարկել փոստով և Ձեզ տրամադրվել է հետեւյալ նմուշի ծանուցագիր:
+    </p>
+
+    <table class="table table-striped">
+        <tr>
+            <td>Դիմումի գրանցման ամսաթիվ</td>
+            <td>
+                @Html.DisplayFor(model => model.InvocationDate)
+            </td>
+        </tr>
+        <tr>
+            <td>Ում է դիմել</td>
+            <td>
+                @Html.DisplayFor(model => model.OrganizationName) -
+                @Html.DisplayFor(model => model.OrganizationCode)
+            </td>
+        </tr>
+        <tr>
+            <td>Դիմելու նպատակ</td>
+            <td>
+                @Html.DisplayFor(model => model.InvocationPurposeName)
+            </td>
+        </tr>
+        <tr>
+            <td>Դիմումատու</td>
+            <td>
+                @Html.DisplayFor(model => model.FirstName)
+                @Html.DisplayFor(model => model.PatronymicName)
+                @Html.DisplayFor(model => model.LastName)
+            </td>
+        </tr>
+        <tr>
+            <td>Դիմումատուի ծննդյան տարեթիվ</td>
+            <td>
+                @Html.DisplayFor(model => model.BirthDate)
+            </td>
+        </tr>
+        <tr>
+            <td>Դիմումատուի բնակության հասցե</td>
+            <td>
+                @if (!String.IsNullOrEmpty(Model.RegionName))
+                {
+                    @Html.DisplayFor(model => model.RegionName)<span>,</span>
+                }
+                @if (!String.IsNullOrEmpty(Model.CommunityName))
+                {
+                    @Html.DisplayFor(model => model.CommunityName)<span>,</span>
+                }
+                @if (!String.IsNullOrEmpty(Model.Street))
+                {
+                    @Html.DisplayFor(model => model.Street)<span>,</span>
+                }
+                @if (!String.IsNullOrEmpty(Model.Home))
+                {
+                    @Html.DisplayFor(model => model.Home)<span>,</span>
+
+                }
+                @if (!String.IsNullOrEmpty(Model.Room))
+                {
+                    @Html.DisplayFor(model => model.Room)
+                }
+            </td>
+
+        </tr>
+        <tr>
+            <td>Դիմումատուի հեռախոսահամար</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Էլեկտրոնային փոստի հասցե</td>
+            <td>
+                @Html.DisplayFor(model => model.ResidentMail)
+            </td>
+        </tr>
+        <tr>
+            <td>Բժշկական ցուցումներ</td>
+            <td>
+                @if (ViewBag.File1 != null)
+                {
+                    <span>Առկա է</span>
+                }
+                else
+                {
+                    <span>Առկա չէ</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Սոցկարգավիճակը հավաստող փաստաթղթեր</td>
+            <td>
+                @if (ViewBag.File2 != null)
+                {
+                    <span>Առկա է</span>
+                }
+                else
+                {
+                    <span>Առկա չէ</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Միջնորդագրեր, միջնորդություններ</td>
+            <td>
+                @if (ViewBag.File3 != null)
+                {
+                    <span>Առկա է</span>
+                }
+                else
+                {
+                    <span>Առկա չէ</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Այլ փաստաթղթեր</td>
+            <td>
+                @if (ViewBag.File4 != null)
+                {
+                    <span>Առկա է</span>
+                }
+                else
+                {
+                    <span>Առկա չէ</span>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Դիմումի կարգավիճակը</td>
+            <td>
+                @Html.DisplayFor(model => model.InvocationStatusTypeName)
+            </td>
+        </tr>
+        <tr>
+            <td>Հսկիչ համար</td>
+            <td>
+                @Html.DisplayFor(model => model.InvocationId)
+            </td>
+        </tr>
+    </table>
+    @if (Model.InitiationTypeId == 1)
+    {
+        <p>
+            Դիմումը ներկայացվել է ձեռագիր տարբերակով
+        </p>
+    }
+    <p>
+        Ձեզ տրամադրված ծանուցագրում նշված է հսկիչ համար: Մուտքագրեք այդ համարը <b>www.refferal.am</b> կայքի Գլխավոր էջի <b>Հետևել ընթացքին</b> բաժնի <b>Փաստաթղթի համարը</b> դաշտում, ընտրելով փաստաթղթի տեսակը՝ <b>Դիմում</b> և Դուք կտեսնեք Ձեր ներկայացրած դիմումի կարգավիճակը:
+    </p>
+</div>
+
+
+
+<div style="margin:0 auto; padding:0 20px; width:595px;">
+    <button id="rtSave" class="k-button"><i class="fa fa-file-pdf-o"></i> Արտահանել</button>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $("#rtSave")
+            .click(function () {
+                var draw = kendo.drawing;
+                draw.drawDOM($("#content"), {
+                    avoidLinks: true,
+                    paperSize: "A4"
+                })
+                .then(function (root) {
+                    return draw.exportPDF(root);
+                })
+                .done(function (data) {
+                    kendo.saveAs({
+                        dataURI: data,
+                        fileName: '@Model.InvocationId'
+                    });
+                    return false;
+                });
+            });
+
+    }
+)
+</script>

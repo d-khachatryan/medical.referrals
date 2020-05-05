@@ -1,0 +1,279 @@
+﻿@model Medicalreferrals.Models.ReferralItem
+
+@{
+    ViewBag.Title = Model.FirstName + " " + Model.LastName;
+}
+
+@section Styles {
+
+}
+<div style="padding:10px; margin:0 auto; width:595px; text-align:right">
+    <button id="rtSave" class="k-button"><i class="fa fa-file-pdf-o"></i> Արտահանել</button>
+</div>
+
+<div id="refContent" style="width: 595px; height:842px; margin:0 auto">
+    <div class="refferal">
+        <h1 class="col-sm-8">ՈՒՂԵԳԻՐ</h1>
+        <div class="refNumber col-sm-4">
+            <p>
+                <i class="fa fa-certificate" aria-hidden="true"></i> @Html.DisplayFor(model => model.ReferralNumber)
+            </p>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <p class="heading">ՊԵՏՈՒԹՅԱՆ ԿՈՄԻՑ ԵՐԱՇԽԱՎՈՐՎԱԾ ԱՆՎՃԱՐ ԵՎ ԱՐՏՈՆՅԱԼ ՊԱՅՄԱՆՆԵՐՈՎ ԲԺՇԿԱԿԱՆ ՕԳՆՈՒԹՅԱՆ ՈՒ ՍՊԱՍԱՐԿՄԱՆ</p>
+    <p class="heading-breckets">(ուժի մեջ է մտնում տրման պահից մեկ ամիս ժամկետով)</p>
+    <div class="referralContent">
+        <ol>
+            <li>
+                Քաղաքացի <strong>
+                    @Html.DisplayFor(model => model.FirstName)
+                    @Html.DisplayFor(model => model.PatronymicName)
+                    @Html.DisplayFor(model => model.LastName),
+                </strong>
+                <br />
+                ծննդյան ամսաթիվ՝ @Html.DisplayFor(model => model.BirthDate),
+                <br />
+                անձը հաստատող փաստաթուղթ՝ @Html.DisplayFor(model => model.IdentificatorTypeName) - @Html.DisplayFor(model => model.Identificator)
+                <br />
+                բնակության վայր՝ @Html.DisplayFor(model => model.ResidentRegionName),
+                @Html.DisplayFor(model => model.ResidentCommunityName),
+                Փող․ @Html.DisplayFor(model => model.ResidentStreet),
+                Տուն @Html.DisplayFor(model => model.ResidentHome),
+                Բն․ @Html.DisplayFor(model => model.ResidentRoom)
+                <br />
+                հաշվառման վայր՝ @Html.DisplayFor(model => model.HabitantRegionName),
+                @Html.DisplayFor(model => model.HabitantCommunityName),
+                Փող․ @Html.DisplayFor(model => model.HabitantStreet),
+                Տուն @Html.DisplayFor(model => model.HabitantHome),
+                Բն․ @Html.DisplayFor(model => model.HabitantRoom)
+                <br />
+                հեռախոսահամար՝ @Html.DisplayFor(model => model.Phone)
+            </li>
+            <li>
+                Ուղեգրող մարմին (հանձնաժողով) բժշկական կազմակերպություն
+                <br />
+                անվանում՝ @Html.DisplayFor(model => model.ReferralOrganizationName)
+                <br />
+                ծածկագիր՝ @Html.DisplayFor(model => model.ReferralOrganizationCode)
+                <br />
+                գործունեության վայրը՝ @Html.DisplayFor(model => model.ReferralOrganizationLocation)
+                <br />
+                հեռախոսահամար՝ @Html.DisplayFor(model => model.ReferralOrganizationPhone)
+            </li>
+            <li>
+                Ուղոգրվող քաղաքացու նախնական ախտորոշումը՝
+                <br />
+                @Html.DisplayFor(model => model.PreliminaryDiagnose)
+            </li>
+            <li>
+                Ուղեգրման նպատակը
+                <br />
+                @if (Model.ReferralPurpose1 == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.ReferralPurpose1)
+                <br />
+                @if (Model.ReferralPurpose2 == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.ReferralPurpose2)
+                <br />
+                @if (Model.ReferralPurpose3 == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.ReferralPurpose3) -
+                @if (Model.ReferralPurpose3 == true)
+                {
+                    @Html.DisplayFor(model => model.ReferralPurpose3Description)
+                }
+                <br />
+                @if (Model.ReferralPurpose4 == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.ReferralPurpose4)
+                <br />
+                @if (Model.ReferralPurpose5 == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.ReferralPurpose5)
+                <br />
+                @if (Model.ReferralPurpose6 == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.ReferralPurpose6)
+                <br />
+                @if (Model.ReferralPurpose7 == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.ReferralPurpose7) -
+                @if (Model.ReferralPurpose7 == true)
+                {
+                    @Html.DisplayFor(model => model.ReferralPurpose7Description)
+                }
+            </li>
+            <li>
+                Պետական պատվերի իրականացման հիմքերը՝
+                <br />
+                @if (Model.SocialBenefit == true)
+                {
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i>
+                }
+                else
+                {
+                    <i class="fa fa-square-o" aria-hidden="true"></i>
+                }
+                @Html.DisplayNameFor(model => model.SocialBenefit)
+                (@if (Model.SocialBenefit == true)
+                {
+                    @Html.DisplayNameFor(model => model.SocialBenefitDescription)
+                    @Html.DisplayFor(model => model.SocialBenefitDescription)
+                })
+            </li>
+            <li style="margin-top:10px;">
+                Բուժող բժիշկ` @Html.DisplayFor(model => model.PhysicianName), @Html.DisplayFor(model => model.PhysicianCode), ______________________
+            </li>
+            <li>
+                Այլ տեղեկություններ՝ @Html.DisplayFor(model => model.Comment)
+            </li>
+            <li>
+                Ուղեգրող մարմնի (հանձնաժողովի, բժշկական կազմակերպության) ղեկավար
+                <br /><br />
+                ______________________ @Html.DisplayFor(model => model.HeadName)
+                @*<br />
+                (ստորագրություն)*@
+                <br />
+                @Html.DisplayFor(model => model.ReferralDate)
+                <br />
+                <br />
+                Կ․Տ․
+            </li>
+        </ol>
+        <div class="resident">
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(".refNumber").height($(".refNumber").prev("h1").height())
+    $(document).ready(function () {
+        $("#rtSave")
+            .click(function () {
+                var draw = kendo.drawing;
+                draw.drawDOM($("#refContent"), {
+                    avoidLinks: true,
+                    paperSize: "A4"
+                })
+                .then(function (root) {
+                    return draw.exportPDF(root);
+                })
+                .done(function (data) {
+                    kendo.saveAs({
+                        dataURI: data,
+                        fileName: '@Model.InvocationId'
+                    });
+                    return false;
+                });
+            });
+
+    }
+)
+</script>
+
+@*<div class="create-item">
+    <div class="container">
+        <div class="row">
+            <fieldset class="create-fieldset">
+                <legend>8. Ուղեգրող մարմնի (հանձնաժողովի, բժշկական կազմակերպության) ղեկավար </legend>
+                <table class="table table-striped">
+                    <tr>
+                        <td>
+                            Ղեկավար
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.HeadName)
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+            <fieldset class="create-fieldset">
+                <table class="table table-striped">
+                    <tr>
+                        <td>
+                            @Html.DisplayNameFor(model => model.ReferralDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.ReferralDate)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.DisplayNameFor(model => model.ReferralStatusName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => model.ReferralStatusName)
+                        </td>
+                    </tr>
+                    @if (Model.ReferralStatusId == 5)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayNameFor(model => model.ConfirmationDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => model.ConfirmationDate)
+                            </td>
+                        </tr>
+                    }
+                    @if (Model.ReferralStatusId == 3)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayNameFor(model => model.ConformationDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => model.ConformationDate)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </fieldset>
+        </div>
+    </div>
+</div>*@

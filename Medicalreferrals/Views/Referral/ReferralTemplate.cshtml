@@ -1,0 +1,547 @@
+﻿@model Medicalreferrals.Models.ReferralTemplate
+
+@{
+    Layout = null;
+}
+
+
+<script>
+    function onReferralOrganizationSelect(e) {
+        var dataItem = this.dataItem(e.item.index());
+        var idd = dataItem.Value;
+        var q = $.ajax({
+            url: '@Url.Action("OrganizationInfo", "Referral")',
+            dataType: "json",
+            type: "GET",
+            data: { id: idd },
+            async: true,
+            success: function (data) {
+                dt = data.Data;
+                rt = true;
+                if (dt != null) {
+                    $("#ReferralOrganizationCode").val(dt[0].OrganizationCode);
+                    $("#ReferralOrganizationLocation").val(dt[0].OrganizationLocation);
+                    $("#ReferralOrganizationPhone").val(dt[0].Phone);
+                    $("#HeadName").val(dt[0].HeadName);
+                }
+            },
+            error: function (xhr) {
+                dt = xhr;
+                rt = false;
+            }
+        });
+    }
+</script>
+
+@using (Html.BeginForm("SaveReferral", "Referral", FormMethod.Post, new { id = "frmReferral" }))
+{
+    <div class="create-item">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.ReferralId)
+
+        <div class="container">
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>1. Քաղաքացի</legend>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FirstName, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.FirstName)
+                            @Html.ValidationMessageFor(model => model.FirstName, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LastName, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.LastName)
+                            @Html.ValidationMessageFor(model => model.LastName, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PatronymicName, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.PatronymicName)
+                            @Html.ValidationMessageFor(model => model.PatronymicName, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.BirthDate, new { @class = "control-label" })
+                            @(Html.Kendo().DatePickerFor(model => model.BirthDate)
+                            .Format("yyyy-MM-dd")
+                            .HtmlAttributes(new { @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.BirthDate, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IdentificatorTypeId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.IdentificatorTypeId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbIdentificatorTypes)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.IdentificatorTypeId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Identificator, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.Identificator)
+                            @Html.ValidationMessageFor(model => model.Identificator, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Phone, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.Phone)
+                            @Html.ValidationMessageFor(model => model.Phone, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ResidentMail, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.ResidentMail)
+                            @Html.ValidationMessageFor(model => model.ResidentMail, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <h3>Բնակության հասցե</h3>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ResidentRegionId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.ResidentRegionId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbRegions)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.ResidentRegionId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ResidentCommunityId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.ResidentCommunityId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbCommunities)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.ResidentCommunityId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ResidentStreet, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.ResidentStreet)
+                            @Html.ValidationMessageFor(model => model.ResidentStreet, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4 col-lg-1 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ResidentHome, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.ResidentHome)
+                            @Html.ValidationMessageFor(model => model.ResidentHome, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4 col-lg-2 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ResidentRoom, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.ResidentRoom)
+                            @Html.ValidationMessageFor(model => model.ResidentRoom, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <h3>Հաշվառման հասցե</h3>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.HabitantRegionId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.HabitantRegionId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbRegions)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.HabitantRegionId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.HabitantCommunityId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.HabitantCommunityId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbCommunities)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.HabitantCommunityId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.HabitantStreet, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.HabitantStreet)
+                            @Html.ValidationMessageFor(model => model.HabitantStreet, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4 col-lg-1 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.HabitantHome, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.HabitantHome)
+                            @Html.ValidationMessageFor(model => model.HabitantHome, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-md-4 col-lg-2 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.HabitantRoom, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.HabitantRoom)
+                            @Html.ValidationMessageFor(model => model.HabitantRoom, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>2. Ուղեգրող մարմին (հանձնաժողով) բժշկական կազմակերպություն</legend>
+                    <div class="col-sm-12 col-md-9 col-lg-9 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReferralOrganizationId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.ReferralOrganizationId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            .Events(e =>
+                            {
+                                e.Select("onReferralOrganizationSelect");
+                            })
+                            .BindTo(ViewBag.vbOrganizations)
+                            )
+                            @Html.ValidationMessageFor(model => model.ReferralOrganizationId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReferralOrganizationCode, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.ReferralOrganizationCode)
+                            @Html.ValidationMessageFor(model => model.ReferralOrganizationCode, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="col-sm-12 col-md-9 col-lg-9 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReferralOrganizationLocation, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.ReferralOrganizationLocation)
+                            @Html.ValidationMessageFor(model => model.ReferralOrganizationLocation, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ReferralOrganizationPhone, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.ReferralOrganizationPhone)
+                            @Html.ValidationMessageFor(model => model.ReferralOrganizationPhone, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>3. Ուղեգրվող քաղաքացու նախնական ախտորոշումը</legend>
+                    <div class="col-sm-12 col-md-12 col-lg-9 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PreliminaryDiagnose, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.PreliminaryDiagnose)
+                            @Html.ValidationMessageFor(model => model.PreliminaryDiagnose, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>4. Ուղեգրման նպատակը</legend>
+                    <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("ReferralPurpose1", Model.ReferralPurpose1 != null && (bool) Model.ReferralPurpose1, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.ReferralPurpose1, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose1, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("ReferralPurpose2", Model.ReferralPurpose2 != null && (bool) Model.ReferralPurpose2, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.ReferralPurpose2, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose2, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="col-sm-12 col-md-12 col-lg-6 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("ReferralPurpose3", Model.ReferralPurpose3 != null && (bool) Model.ReferralPurpose3, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.ReferralPurpose3, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose3, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-6 border-box">
+                        <div class="form-group">
+                            @*@Html.LabelFor(model => model.ReferralPurpose3Description, new { @class = "control-label" })*@
+                            @Html.Kendo().TextBoxFor(model => model.ReferralPurpose3Description)
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose3Description, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("ReferralPurpose4", Model.ReferralPurpose4 != null && (bool) Model.ReferralPurpose4, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.ReferralPurpose4, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose4, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("ReferralPurpose5", Model.ReferralPurpose5 != null && (bool) Model.ReferralPurpose5, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.ReferralPurpose5, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose5, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="col-sm-12 col-md-12 col-lg-12 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("ReferralPurpose6", Model.ReferralPurpose6 != null && (bool) Model.ReferralPurpose6, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.ReferralPurpose6, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose6, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                    <div class="col-sm-12 col-md-12 col-lg-6 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("ReferralPurpose7", Model.ReferralPurpose7 != null && (bool) Model.ReferralPurpose7, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.ReferralPurpose7, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose7, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-6 border-box">
+                        <div class="form-group">
+                            @*@Html.LabelFor(model => model.ReferralPurpose7Description, new { @class = "control-label" })*@
+                            @Html.Kendo().TextBoxFor(model => model.ReferralPurpose7Description)
+                            @Html.ValidationMessageFor(model => model.ReferralPurpose7Description, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>5. Պետական պատվերի իրականացման հիմքեր</legend>
+                    <div class="col-sm-12 col-md-12 col-lg-6 border-box">
+                        <div class="form-group">
+                            @Html.CheckBox("SocialBenefit", Model.SocialBenefit != null && (bool) Model.ReferralPurpose1, new { @class = "control-label" })
+                            @Html.LabelFor(model => model.SocialBenefit, htmlAttributes: new { @class = "control-label" })
+                            @Html.ValidationMessageFor(model => model.SocialBenefit, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-6 border-box">
+                        <div class="form-group">
+                            @*@Html.LabelFor(model => model.SocialBenefitDescription, new { @class = "control-label" })*@
+                            @Html.Kendo().TextBoxFor(model => model.SocialBenefitDescription)
+                            @Html.ValidationMessageFor(model => model.SocialBenefitDescription, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>6. Բուժող բժիշկ</legend>
+                    <div class="col-sm-12 col-md-12 col-lg-9 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PhysicianId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.PhysicianId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbPhysicians)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.PhysicianId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PhysicianCode, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.PhysicianCode)
+                            @Html.ValidationMessageFor(model => model.PhysicianCode, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>7. Այլ տեղեկություններ</legend>
+                    <div class="col-sm-12 col-md-12 col-lg-9 border-box">
+                        <div class="form-group">
+                            @*@Html.LabelFor(model => model.Comment, new { @class = "control-label" })*@
+                            @Html.Kendo().TextBoxFor(model => model.Comment)
+                            @Html.ValidationMessageFor(model => model.Comment, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <legend>8. Ողեգրող մարմնի (հանձնաժողովի, բժշկական կազմակերպության) ղեկավար </legend>
+                    <div class="col-sm-12 col-md-12 col-lg-9 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.HeadName, new { @class = "control-label" })
+                            @Html.Kendo().TextBoxFor(model => model.HeadName)
+                            @Html.ValidationMessageFor(model => model.HeadName, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+            <div class="row">
+                <fieldset class="create-fieldset">
+                    <div class="col-sm-12 col-md-6 col-lg-3 border-box">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.InvocationId, new { @class = "control-label" })
+                            @(Html.Kendo().ComboBoxFor(model => model.InvocationId)
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .Filter(FilterType.StartsWith)
+                            .BindTo(ViewBag.vbInvocations)
+                            .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                            )
+                            @Html.ValidationMessageFor(model => model.InvocationId, null, new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12 col-md-6 col-lg-9 border-box">
+                        <div class="form-group">
+                            <label class="control-label" style="color: transparent;">.</label>
+                            <div class="input-item align-right">
+                                <button id="rtSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+                                <button id="rtCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clear"></div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+    $(document).ready(function () {
+        $("#SocialBenefitDescription").attr("placeholder", "հավաստագրի համարը");
+        $(".k-textbox").addClass("input-item");
+
+        $("#rtCancel")
+            .click(function () {
+                $(this).closest(".k-window-content").data("kendoWindow").close();
+                return false;
+            });
+        $("#rtSave")
+            .click(function (e) {
+                var errTempl = '<div class="k-widget k-tooltip k-tooltip-validation" style="margin:0.5em"><span class="k-icon k-warning"> </span>#=message#<div class="k-callout k-callout-n"></div></div>';
+                var validator = $("#frmReferral").kendoValidator({
+                    errorTemplate: errTempl
+                }).data("kendoValidator");
+                if (!validator.validate()) {
+                    return false;
+                }
+
+                var item = new Object();
+                item.ReferralId = '@Model.ReferralId';
+
+                item.FirstName = $("#FirstName").val();
+                item.LastName = $("#LastName").val();
+                item.PatronymicName = $("#PatronymicName").val();
+                item.BirthDate = $("#BirthDate").val();
+                item.IdentificatorTypeId = $("#IdentificatorTypeId").val();
+                item.Identificator = $("#Identificator").val();
+                item.Phone = $("#Phone").val();
+                item.ResidentRegionId = $("#ResidentRegionId").val();
+                item.ResidentCommunityId = $("#ResidentCommunityId").val();
+                item.ResidentStreet = $("#ResidentStreet").val();
+                item.ResidentHome = $("#ResidentHome").val();
+                item.ResidentRoom = $("#ResidentRoom").val();
+                item.HabitantRegionId = $("#HabitantRegionId").val();
+                item.HabitantCommunityId = $("#HabitantCommunityId").val();
+                item.HabitantStreet = $("#HabitantStreet").val();
+                item.HabitantHome = $("#HabitantHome").val();
+                item.HabitantRoom = $("#HabitantRoom").val();
+                item.ReferralOrganizationId = $("#ReferralOrganizationId").val();
+                item.ReferralOrganizationCode = $("#ReferralOrganizationCode").val();
+                item.ReferralOrganizationLocation = $("#ReferralOrganizationLocation").val();
+                item.ReferralOrganizationPhone = $("#ReferralOrganizationPhone").val();
+                item.PreliminaryDiagnose = $("#PreliminaryDiagnose").val();
+                item.ReferralPurpose1 = $("#ReferralPurpose1").prop('checked');
+                item.ReferralPurpose2 = $("#ReferralPurpose2").prop('checked');
+                item.ReferralPurpose3 = $("#ReferralPurpose3").prop('checked');
+                item.ReferralPurpose3Description = $("#ReferralPurpose3Description").val();
+                item.ReferralPurpose4 = $("#ReferralPurpose4").prop('checked');
+                item.ReferralPurpose5 = $("#ReferralPurpose5").prop('checked');
+                item.ReferralPurpose6 = $("#ReferralPurpose6").prop('checked');
+                item.ReferralPurpose7 = $("#ReferralPurpose7").prop('checked');
+                item.ReferralPurpose7Description = $("#ReferralPurpose7Description").val();
+                item.SocialBenefit = $("#SocialBenefit").prop('checked');
+                item.SocialBenefitDescription = $("#SocialBenefitDescription").val();
+                item.PhysicianId = $("#PhysicianId").val();
+                item.PhysicianCode = $("#PhysicianCode").val();
+                item.HeadName = $("#HeadName").val();
+                item.ResidentMail = $("#ResidentMail").val();
+                item.Comment = $("#Comment").val();
+                item.InvocationId = $("#InvocationId").val();
+
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("SaveReferral", "Referral")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ referralTemplate: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt.statuscode == 1) {
+                        $(this).closest(".k-window-content").data("kendoWindow").close();
+                        return false;
+                    }
+                    else {
+                        //$("#errormssg").html(dt.message);
+                        return false;
+                    }
+                }
+                else {
+                    //system error ocured. The popup will be closed. The view will be redirected to error page.
+                    $(this).closest(".k-window-content").data("kendoWindow").close();
+                }
+            });
+    });
+</script>

@@ -1,0 +1,163 @@
+﻿@model IEnumerable<Medicalreferrals.Models.PhysicianItem>
+
+@{
+    ViewBag.Title = "Բժիշկներ";
+}
+
+@(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Նոր Գրառում").Id("btnInsert").Click("CreatePhysician");
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Մանրամասն").Id("btnDetail").Click("ShowDetail");
+    })
+)
+@(Html.Kendo().Grid<Medicalreferrals.Models.PhysicianItem>()
+      .Name("Physician")
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.PhysicianId).Hidden();
+          columns.Bound(model => model.PhysicianCode).Width(100);
+          columns.Bound(model => model.FirstName).Width(180);
+          columns.Bound(model => model.LastName).Width(200);
+          columns.Bound(model => model.PatronymicName).Width(180);
+          columns.Bound(model => model.OrganizationName);
+          columns.Command(commands =>
+          {
+              commands.Custom("cmdUpdatePhysician").Text(" ").Click("UpdatePhysician").HtmlAttributes(new { @class = "Update_Icon" });
+              commands.Custom("cmdDeletePhysician").Text(" ").Click("DeletePhysician").HtmlAttributes(new { @class = "Delete_Icon" });
+          }).Title("Հրահանգներ").Width(130);
+      })
+
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Events(e => e.DataBound("showCommandIcons"))
+      .Pageable()
+      .Filterable()
+      .Scrollable()
+      .Sortable()
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadPhysicians", "Physician"))
+          .PageSize(15)
+          .Model(model => model.Id(p => p.PhysicianId)
+
+          )
+)
+)
+
+@(Html.Kendo().Window().Name("wPhysician")
+              .Width(750)
+              .Height(240)
+              .Draggable().Resizable()
+              .Content("").Modal(true).Actions(actions => actions.Pin().Close())
+              .Visible(false).Events(events => events
+              .Close("onClosePhysician")
+              .Open("onOpenPhysician")
+              .Refresh("onRefreshPhysician"))
+)
+
+@(Html.Kendo().Window().Name("wPhysicianDetails")
+              .Width(600)
+              .Height(240)
+              .Draggable().Resizable()
+              .Content("").Modal(true).Actions(actions => actions.Pin().Close())
+              .Visible(false).Events(events => events
+              .Close("onClosePhysician")
+              .Open("onOpenPhysician")
+              .Refresh("onRefreshPhysician"))
+)
+
+<script>
+
+    function CreatePhysician() {
+        var window = $("#wPhysician").data("kendoWindow");
+        window.content("");
+        window.title("Նոր գրառում");
+        window.refresh({
+            url: "@Url.Action("CreatePhysician", "Physician")"
+        });
+    window.center();
+    window.open();
+    return false;
+    }
+
+    function UpdatePhysician(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#Physician").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var window = $("#wPhysician").data("kendoWindow");
+        window.content("");
+        window.title("Խմբագրել");
+        window.refresh({
+            url: "@Url.Action("UpdatePhysician", "Physician")" + "/" + dataItem.PhysicianId
+        });
+    window.center();
+    window.open();
+    return false;
+    }
+
+    function DeletePhysician(e) {
+        var row = $(e.target).closest("tr");
+        var grid = $("#Physician").data("kendoGrid");
+        var dataItem = grid.dataItem(row);
+        var r = confirm("Ցանկանում էք հեռացնել գրառումը՞:");
+        if (r == false) {
+            return false;
+        }
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("DeletePhysician", "Physician")',
+            dataType: "json",
+            type: "GET",
+            data: { id: dataItem.PhysicianId },
+            async: false,
+            success: function (data) { dt = data; rt = true; },
+            error: function (xhr) { dt = xhr; rt = false; }
+        });
+        if (rt == true) {
+            if (dt != "1") {
+                alert(JSON.stringify(dt));
+            }
+            else {
+                $("#Physician").data("kendoGrid").dataSource.read();
+            }
+        }
+        else {
+            alert(dt);
+            return false;
+        }
+        return false;
+    }
+
+    function ShowDetail() {
+        var grid = $("#Physician").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+        if (selectedItem == null) {
+            alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+            return false;
+        };
+        var window = $("#wPhysicianDetails").data("kendoWindow");
+        window.content("");
+        window.title("Մանրամասն");
+        window.refresh({
+            url: "@Url.Action("PhysicianDetail", "Physician")" + "/" + selectedItem.PhysicianId
+        });
+        window.center();
+        window.open();
+        return false;
+    }
+
+    function onOpenPhysician(e) {
+        kendo.ui.progress(e.sender.element, true);
+    }
+    function onClosePhysician(e) {
+        $("#Physician").data("kendoGrid").dataSource.read();
+        $(".k-overlay").css("display", "none");
+    }
+    function onRefreshPhysician(e) {
+        kendo.ui.progress(e.sender.element, false);
+    }
+</script>

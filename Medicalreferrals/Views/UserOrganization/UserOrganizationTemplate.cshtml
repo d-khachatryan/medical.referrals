@@ -1,0 +1,105 @@
+﻿@model Medicalreferrals.Models.UserOrganization
+
+@{
+    Layout = null;
+}
+
+<div class="create-item">
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.UserOrganizationId)
+    @Html.HiddenFor(model => model.Id)
+    <div class="col-sm-12 border-box">
+        <div class="form-group margin-10-0">
+            @Html.LabelFor(model => model.OrganizationId, new { @class = "control-label" })
+            @(Html.Kendo().ComboBoxFor(model => model.OrganizationId)
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbOrganizations)
+                    .HtmlAttributes(new { data_value_primitive = true })
+            )
+            @Html.ValidationMessageFor(model => model.OrganizationId, null, new { @class = "text-danger" })
+        </div>
+        <div class="form-group margin-10-0">
+            @Html.CheckBox("Psm01", Model.Psm01 != null && (bool)Model.Psm01)
+            @Html.LabelFor(model => model.Psm01, new { @class = "control-label" })
+            @Html.ValidationMessageFor(model => model.Psm01, null, new { @class = "text-danger" })
+        </div>
+        <div class="form-group margin-10-0">
+            @Html.CheckBox("Psm02", Model.Psm02 != null && (bool)Model.Psm01)
+            @Html.LabelFor(model => model.Psm02, new { @class = "control-label" })
+            @Html.ValidationMessageFor(model => model.Psm02, null, new { @class = "text-danger" })
+        </div>
+        <div class="form-group margin-10-0">
+            @Html.CheckBox("Psm03", Model.Psm03 != null && (bool)Model.Psm01)
+            @Html.LabelFor(model => model.Psm03, new { @class = "control-label" })
+            @Html.ValidationMessageFor(model => model.Psm03, null, new { @class = "text-danger" })
+        </div>
+
+    </div>
+    <div class="col-sm-12 border-box align-right margin-20-0">
+        <div class="form-group">
+            <button id="uotSave" class="k-button"><i class="glyphicon glyphicon-floppy-disk"></i>Հիշել</button>
+            <button id="uotCancel" class="k-button"><i class="glyphicon glyphicon-off"></i>Ելք</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $("label").css(
+            "padding-top", "6px"
+            );
+
+        $("#uotCancel")
+            .click(function () {
+                if ($(this).closest(".k-window-content").data("kendoWindow"))
+                    $(this).closest(".k-window-content").data("kendoWindow").close();
+            });
+        $("#uotSave")
+            .click(function (e) {
+
+                var item = new Object();
+                item.UserOrganizationId = '@Model.UserOrganizationId ';
+                item.Id = '@Model.Id';
+                item.OrganizationId = $("#OrganizationId").val();
+                item.Psm01 = $("#Psm01").prop('checked');
+                item.Psm02 = $("#Psm02").prop('checked');
+                item.Psm03 = $("#Psm03").prop('checked');
+
+                var rt = false;
+                var dt;
+                var q = $.ajax({
+                    url: '@Url.Action("SaveUserOrganization", "UserOrganization")',
+                    dataType: "json",
+                    type: "POST",
+                    data: JSON.stringify({ userOrganization: item }),
+                    contentType: "application/json; charset=utf-8",
+                    async: false,
+                    success: function (data) {
+                        dt = data;
+                        rt = true;
+                    },
+                    error: function (xhr) {
+                        dt = xhr;
+                        rt = false;
+                    }
+                });
+                if (rt == true) {
+                    if (dt != "1") {
+                        alert(JSON.stringify(dt));
+                    }
+                    else {
+                        if ($(this).closest(".k-window-content").data("kendoWindow"))
+                            $(this).closest(".k-window-content").data("kendoWindow").close();
+                    }
+                }
+                else {
+                    alert(dt);
+                    return false;
+                }
+            });
+    });
+</script>

@@ -1,0 +1,436 @@
+﻿@model IEnumerable<Medicalreferrals.Models.InvocationItem>
+
+@{
+    ViewBag.Title = "Դիմումի բավարարում";
+}
+
+<div class="for-Toolbar">
+    @(Html.Kendo().ToolBar()
+    .Name("ToolBar")
+    .Items(items =>
+    {
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Բավարարել").Id("btnConfirm").Click("ConfirmInvocation");
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Վերադարձնել խմբագրման").Id("btnReturnUpdate").Click("ReturnUpdateInvocation");
+        items.Add().Type(CommandType.Button).Togglable(false).Text("Չեղարկել").Id("btnCancel").Click("CancelInvocation");
+    })
+    )
+    @* Search Panel - Right Slide *@
+    <div class="right-slidePanel">
+        <div class="slidePanel-Content">
+            <div class="slidePanel-btn">
+            </div>
+            <div class="slidePanel-Content-fields create-item">
+                <h4>Դիմումի որոնում</h4>
+                <div class="form-group margin-5-0">
+                    <input id="prmInvocationId" class="input-item k-textbox" placeholder="Դիմումի համար" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmFirstName" class="input-item k-textbox" placeholder="Անուն" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmLastName" class="input-item k-textbox" placeholder="Ազգանուն" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <label class="">Ծննդյան ա/թ</label>
+                    @(Html.Kendo().DatePicker()
+                                        .Name("prmBirthDate")
+                                        .HtmlAttributes(new { placeholder = "Ծննդյան ա/թ" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    <label class="control-label" for="prmInitiationStartDate">Դիմումի ներկայացման ժամանակահատված</label>
+                    <div class="input-search data-period">
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmInitiationStartDate")
+                                        .HtmlAttributes(new { placeholder = "սկիզբ" })
+                        )
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmInitiationFinishDate")
+                                        .HtmlAttributes(new { placeholder = "ավարտ" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group margin-5-0">
+                    <label class="control-label" for="prmConformationStartDate">Դիմումի համաձայնեցման ժամանակահատված</label>
+                    <div class="input-search data-period">
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmConformationStartDate")
+                                        .HtmlAttributes(new { placeholder = "սկիզբ" })
+                        )
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmConformationFinishDate")
+                                        .HtmlAttributes(new { placeholder = "ավարտ" })
+                        )
+
+                    </div>
+                </div>
+                <div class="form-group margin-5-0">
+                    <label class="control-label" for="prmConfirmationStartDate">Դիմումի բավարարման ժամանակահատված</label>
+                    <div class="input-search data-period">
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmConfirmationStartDate")
+                                        .HtmlAttributes(new { placeholder = "սկիզբ" })
+                        )
+                        @(Html.Kendo().DatePicker()
+                                        .Name("prmConfirmationFinishDate")
+                                        .HtmlAttributes(new { placeholder = "ավարտ" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group margin-5-0">
+                    @(Html.Kendo().ComboBox()
+                    .Name("prmInvocationStatusId")
+                    .Placeholder("Կարգավիճակ")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbInvocationStatuses)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    @(Html.Kendo().ComboBox()
+                    .Name("prmInvocationPurposeId")
+                    .Placeholder("Նպատակ")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbInvocationPurposes)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    @(Html.Kendo().ComboBox()
+                    .Name("prmOrganizationId")
+                    .Placeholder("Դիմած կազմակերպություն")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbOrganizations)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    @(Html.Kendo().ComboBox()
+                    .Name("prmRegionId")
+                    .Placeholder("Մարզ")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .Filter(FilterType.StartsWith)
+                    .BindTo(ViewBag.vbRegions)
+                    .HtmlAttributes(new { data_value_primitive = true, @class = "input-item" })
+                    )
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmUserName1" class="input-item k-textbox" placeholder="Նախապատրաստողի տվյալներ" />
+                </div>
+                <div class="form-group margin-5-0">
+                    <input id="prmUserName2" class="input-item k-textbox" placeholder="Համաձայնեցում տվողների տվյալներ" />
+                </div>
+                <div class="form-group btns align-right">
+                    <button type="submit" id="rtSearch" class="k-button" onclick="return Search();"><i class="glyphicon glyphicon-search"></i> Որոնել</button>
+                    <button type="submit" class="k-button" onclick="return Clear();"><i class="glyphicon glyphicon-minus"></i> Մաքրել</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document)
+        .ready(function () {
+            currentInvocationIndex = -1;
+        });
+    function Search() {
+        $("#Invocation").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function Clear() {
+        $("#prmInvocationId").val("");
+        $("#prmFirstName").val("");
+        $("#prmLastName").val("");
+        $("#prmBirthDate").val("");
+        $("#prmInitiationStartDate").val("");
+        $("#prmInitiationFinishDate").val("");
+        $("#prmConformationStartDate").val("");
+        $("#prmConformationFinishDate").val("");
+        $("#prmConfirmationStartDate").val("");
+        $("#prmConfirmationFinishDate").val("");
+        $("#prmInvocationStatusId").data("kendoComboBox").select(-1);
+        $("#prmInvocationPurposeId").data("kendoComboBox").select(-1);
+        $("#prmOrganizationId").data("kendoComboBox").select(-1);
+        $("#prmRegionId").data("kendoComboBox").select(-1);
+        $("#prmUserName1").val("");
+        $("#prmUserName2").val("");
+        $("#Invocation").data("kendoGrid").dataSource.read();
+        return false;
+    }
+
+    function getParameter() {
+        return {
+            invocationId: $("#prmInvocationId").val(),
+            firstName: $("#prmFirstName").val(),
+            lastName: $("#prmLastName").val(),
+            birthDate: $("#prmBirthDate").val(),
+            initiationStartDate: $("#prmInitiationStartDate").val(),
+            initiationFinishDate: $("#prmInitiationFinishDate").val(),
+            conformationStartDate: $("#prmConformationStartDate").val(),
+            conformationFinishDate: $("#prmConformationFinishDate").val(),
+            confirmationStartDate: $("#prmConfirmationStartDate").val(),
+            confirmationFinishDate: $("#prmConfirmationFinishDate").val(),
+            invocationStatusId: $("#prmInvocationStatusId").val(),
+            invocationPurposeId: $("#prmInvocationPurposeId").val(),
+            organizationId: $("#prmOrganizationId").val(),
+            regionId: $("#prmRegionId").val(),
+            userName1: $("#prmUserName1").val(),
+            userName2: $("#prmUserName2").val(),
+        };
+    }
+</script>
+
+@(Html.Kendo().Grid<Medicalreferrals.Models.InvocationItem>()
+      .Name("Invocation")
+      .Events(events => events.DataBound("onInvocationDataBound").DetailExpand("onInvocationDetailExpand"))
+      .Columns(columns =>
+      {
+          columns.Bound(model => model.InvocationId);
+          columns.Bound(model => model.FirstName);
+          columns.Bound(model => model.LastName);
+          columns.Bound(model => model.PatronymicName);
+          columns.Bound(model => model.BirthDate);
+          columns.Bound(model => model.InvocationStatusName);
+          columns.Bound(model => model.ConformationUserName);
+          columns.Bound(model => model.ConfirmationUserName);
+      })
+
+      .Selectable(s => s.Mode(GridSelectionMode.Single))
+      .Pageable()
+      .Scrollable()
+      .Sortable()
+      .ClientDetailTemplateId("template")
+      .Resizable(resize => resize.Columns(true))
+      .Reorderable(reorder => reorder.Columns(true))
+      .DataSource(dataSource => dataSource
+          .Ajax()
+          .Read(read => read.Action("ReadInvocations3", "Invocation").Data("getParameter"))
+          .PageSize(15)
+          .Sort(sort => sort.Add("InvocationId").Descending())
+          .Model(model =>
+          {
+              model.Id(p => p.InvocationId);
+          }
+          )
+)
+)
+
+
+<script>
+    $("#wInvocation").kendoWindow({
+        width: "95%",
+        height: "85%"
+    });
+
+
+    function onInvocationDataBound(e) {
+        if (currentInvocationIndex != -1) {
+            var row = $(this.tbody).find("tr.k-master-row:eq(" + currentInvocationIndex + ")");
+            this.expandRow(row);
+        }
+    }
+
+    function onInvocationDetailExpand(e) {
+        currentInvocationIndex = $(e.masterRow).index(".k-master-row");
+        var selectedItem = this.dataItem(e.masterRow);
+        IID = selectedItem.InvocationId;
+        //RSID = selectedItem.InvocationStatusId;
+        this.collapseRow(this.tbody.find(' > tr.k-master-row').not(e.masterRow));
+    }
+
+    function ConfirmInvocation() {
+
+        var grid = $("#Invocation").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+
+        if (selectedItem == null) {
+            alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+            return false;
+        }
+
+        if (selectedItem.InvocationStatusId != 4) {
+            alert("Բավարարել կարելի է միայն այն դիմումը, որն ունի «Ներկայացվել է բավարարման» կարգավիճակ:");
+            return false;
+        }
+
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("ConfirmInvocation", "Invocation")',
+            dataType: "json",
+            type: "GET",
+            data: { id: selectedItem.InvocationId },
+            async: false,
+            success: function (data) { dt = data; rt = true; },
+            error: function (xhr) { dt = xhr; rt = false; }
+        });
+
+        if (rt == true) {
+            if (dt.statuscode == 1) {
+                $("#Invocation").data("kendoGrid").dataSource.read();
+                alert(dt.message);
+            }
+            else {
+                alert(dt.message);
+            }
+        }
+        else {
+            alert("Չբացահայտված տեխնիկական սխալ:");
+        }
+        return false;
+    }
+
+    function ReturnUpdateInvocation() {
+
+        var grid = $("#Invocation").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+
+        if (selectedItem == null) {
+            alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+            return false;
+        }
+
+        if (selectedItem.InvocationStatusId != 4) {
+            alert("Վերադարձնել խմբագրման կարելի է միայն այն դիմումը, որն ունի «Ներկայացվել է բավարարման» կարգավիճակ:");
+            return false;
+        }
+
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("ReturnUpdateInvocation", "Invocation")',
+            dataType: "json",
+            type: "GET",
+            data: { id: selectedItem.InvocationId },
+            async: false,
+            success: function (data) { dt = data; rt = true; },
+            error: function (xhr) { dt = xhr; rt = false; }
+        });
+
+        if (rt == true) {
+            if (dt.statuscode == 1) {
+                $("#Invocation").data("kendoGrid").dataSource.read();
+                alert(dt.message);
+            }
+            else {
+                alert(dt.message);
+            }
+        }
+        else {
+            alert("Չբացահայտված տեխնիկական սխալ:");
+        }
+        return false;
+    }
+
+    function CancelInvocation() {
+        var grid = $("#Invocation").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+
+        if (selectedItem == null) {
+            alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+            return false;
+        }
+
+        if (selectedItem.InvocationStatusId != 4) {
+            alert("Չեղարկել կարելի է միայն այն դիմումը, որն ունի «Ներկայացվել է բավարարման» կարգավիճակ:");
+            return false;
+        }
+
+        var rt = false;
+        var dt;
+        var q = $.ajax({
+            url: '@Url.Action("CancelInvocation", "Invocation")',
+            dataType: "json",
+            type: "GET",
+            data: { id: selectedItem.InvocationId },
+            async: false,
+            success: function (data) { dt = data; rt = true; },
+            error: function (xhr) { dt = xhr; rt = false; }
+        });
+
+        if (rt == true) {
+            if (dt.statuscode == 1) {
+                $("#Invocation").data("kendoGrid").dataSource.read();
+                alert(dt.message);
+            }
+            else {
+                alert(dt.message);
+            }
+        }
+        else {
+            alert("Չբացահայտված տեխնիկական սխալ:");
+        }
+        return false;
+    }
+
+    function ShowDetail() {
+        var grid = $("#Invocation").data("kendoGrid");
+        var selectedItem = grid.dataItem(grid.select());
+        if (selectedItem == null) {
+            alert("Գործողությունը իրականացնելու համար անհրաժեշտ գրառումը ընտրված չէ:");
+            return false;
+        };
+        window.location.href = '@Url.Action("InvocationDetail", "Invocation")/' + selectedItem.ReferralId;
+        @*$.ajax({
+            url: '@Url.Action("ReferralDetail", "Referral")' + "/" + selectedItem.ReferralId,
+            type: 'GET',
+            //data: { id: selectedItem.ReferralId },
+            success: function (result) { },
+            error: function () { alert('something bad happened'); }
+        });*@
+        return false;
+    }
+
+</script>
+
+<script id="template" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+          .Name("tabStrip_#=InvocationId#")
+          .SelectedIndex(0)
+          .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+          .Items(items =>
+          {
+          items.Add().Text("Կից փաստաթղթեր").Content(@<text>
+        @(Html.Kendo().Grid<Medicalreferrals.Models.InvocationDocumentItem>()
+              .Name("Document_#=InvocationId#")
+              .Events(e => e.DataBound("showCommandIcons"))
+              .Columns(columns =>
+              {
+                  columns.Bound(model => model.InvocationDocumentId).Hidden();
+                  columns.Bound(model => model.InvocationId).Hidden();
+                  columns.Bound(model => model.DocumentTypeName);
+                  columns.Bound(model => model.DocumentURL).ClientTemplate(@Html.ActionLink(" ", "DownloadInvocationDocument", "Invocation", new { relativeFilePath = "\\#= DocumentURL\\#" }, new { target = "_blank" }).ToHtmlString()).HtmlAttributes(new { @class = "Show_Icon", style = "text-align:center" }).Width(120);
+              })
+                  .DataSource(dataSource => dataSource
+                      .Ajax()
+                      .PageSize(5)
+                      .Read(read => read.Action("ReadInvocationDocuments", "Invocation", new { id = "#=InvocationId#" }))
+                      .Model(model =>
+                      {
+                          model.Id(p => p.InvocationDocumentId);
+                          model.Field(p => p.DocumentURL);
+                      }
+                      )
+                  )
+                  .Scrollable()
+                  .Resizable(resize => resize.Columns(true))
+                  .Reorderable(reorder => reorder.Columns(true))
+                  .Pageable()
+                  .Sortable()
+                  .ToClientTemplate()
+        )
+        </text>);
+          })
+            .ToClientTemplate())
+</script>
+
+

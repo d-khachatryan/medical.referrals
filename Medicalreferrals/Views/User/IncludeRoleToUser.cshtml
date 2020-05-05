@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = Resources.User_Manage_Title;
+}
+<h2>@Resources.User_Manage_Title</h2>
+
+@using (Html.BeginForm("IncludeRoleToUser", "Users", new { userName = ViewBag.vbUserName, searchString = ViewBag.vbSearchString, page = ViewBag.vbpage, sortOrder = ViewBag.vbsortOrder }))
+{
+    <div class="form-horizontal">
+
+        <hr />
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+
+        <div class="form-group">
+            <label class="control-label col-md-3">@Resources.User_Name</label>
+            <div class="col-md-9">
+                @Html.TextBox("UserName", (string) ViewBag.vbUserName, new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-3">@Resources.User_Role</label>
+            <div class="col-md-9">
+                @Html.DropDownList("RoleName", (IEnumerable<SelectListItem>) ViewBag.vbRoles, "Select ...", new {@class = "form-control"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-3 col-md-9">
+                <button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-floppy-disk"></i> @Resources.General_Save</button>
+            </div>
+        </div>
+    </div>
+}
+<div>
+    <a href="@Url.Action("Index","Users", new { userName = ViewBag.vbUserName, searchString = ViewBag.vbSearchString, page = ViewBag.vbpage, sortOrder = ViewBag.vbsortOrder })" class="btn btn-info">
+        <i class="glyphicon glyphicon-arrow-left"></i> @Resources.General_Back
+    </a>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
